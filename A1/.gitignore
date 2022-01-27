@@ -1,0 +1,6 @@
+
+# We dont need .o files in github
+*.o
+
+# Make product not needed
+mysh
