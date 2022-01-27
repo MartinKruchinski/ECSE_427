@@ -5,15 +5,18 @@
 #include "shellmemory.h"
 #include "shell.h"
 
-int MAX_ARGS_SIZE = 3;
+int MAX_ARGS_SIZE = 7; // CHANGED FROM 3 TO 7
 
 int help();
 int quit();
 int badcommand();
 int set(char* var, char* value);
+int set2(char* var, char* values[], int size); // NEW METHOD ( CHANGE NAME LATER )
 int print(char* var);
 int run(char* script);
 int badcommandFileDoesNotExist();
+int badcommandTooManyTokens(); // NEW METHOD
+
 
 // Interpret commands and their arguments
 int interpreter(char* command_args[], int args_size){
@@ -39,9 +42,15 @@ int interpreter(char* command_args[], int args_size){
 		return quit();
 
 	} else if (strcmp(command_args[0], "set")==0) {
-		//set
-		if (args_size != 3) return badcommand();
-		return set(command_args[1], command_args[2]);
+		// printf("SET COMMAND");
+
+		// OLD CODE
+		// if (args_size != 3) return badcommand();
+		// return set(command_args[1], command_args[2]);
+
+		// NEW CODE
+		if (args_size > 7) return badcommandTooManyTokens();
+		return set2(command_args[1], command_args, args_size); // Here we need to pass all the params that can be included in the set, along with args size
 
 	} else if (strcmp(command_args[0], "print")==0) {
 		if (args_size != 2) return badcommand();
@@ -82,6 +91,12 @@ int badcommandFileDoesNotExist(){
 	return 3;
 }
 
+// For set command only
+int badcommandTooManyTokens(){
+	printf("%s\n", "Bad command: Too many tokens");
+	return 2;
+}
+
 int set(char* var, char* value){
 
 	char *link = "=";
@@ -89,11 +104,44 @@ int set(char* var, char* value){
 	strcpy(buffer, var);
 	strcat(buffer, link);
 	strcat(buffer, value);
-test
+
 	mem_set_value(var, value);
 
 	return 0;
 
+}
+
+/**
+	This method is used for when there are multiple words for a variable
+	$ set x 20 bob alice toto xyz
+	$ print x
+	20 bob alice toto xyz
+	$ set x 12345 20 bob alice toto xyz
+	Bad command: Too many tokens
+	$ print x
+ 	20 bob alice toto xyz
+**/
+int set2(char* var, char* values[], int size){
+
+	int i = 2;
+	char *newValue = (char *)malloc(0);
+
+	for (i; i < size - 1; i++){
+		strcat(newValue, values[i]);
+		strcat(newValue, " ");
+	}
+
+	strcat(newValue, values[i]); // Append last value without the space
+
+	char *link = "=";
+	char buffer[1000];
+	strcpy(buffer, var);
+	strcat(buffer, link);
+	strcat(buffer, newValue);
+
+	mem_set_value(var, newValue);
+
+	return 0;
 }
 
 int print(char* var){

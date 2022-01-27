@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> 
+#include <string.h>
 
 #include "interpreter.h"
 #include "shellmemory.h"
@@ -23,11 +23,11 @@ int main(int argc, char *argv[]) {
 	//init user input
 	for (int i=0; i<MAX_USER_INPUT; i++)
 		userInput[i] = '\0';
-	
+
 	//init shell memory
 	mem_init();
 
-	while(1) {							
+	while(1) {
 		printf("%c ",prompt);
 		fgets(userInput, MAX_USER_INPUT-1, stdin);
 
@@ -43,10 +43,10 @@ int main(int argc, char *argv[]) {
 
 // Extract words from the input then call interpreter
 int parseInput(char ui[]) {
- 
+
 	char tmp[200];
-	char *words[100];							
-	int a,b;							
+	char *words[100];
+	int a,b;
 	int w=0; // wordID
 
 	for(a=0; ui[a]==' ' && a<1000; a++);		// skip white spaces
@@ -55,12 +55,12 @@ int parseInput(char ui[]) {
 
 		for(b=0; ui[a]!='\0' && ui[a]!=' ' && a<1000; a++, b++)
 			tmp[b] = ui[a];						// extract a word
-	 
+
 		tmp[b] = '\0';
 
 		words[w] = strdup(tmp);
 
-		a++; 
+		a++;
 		w++;
 	}
 
