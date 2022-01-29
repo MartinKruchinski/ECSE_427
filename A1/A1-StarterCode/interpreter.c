@@ -14,12 +14,11 @@ int badcommand();
 int set(char* var, char* value);
 int set2(char* var, char* values[], int size); // NEW METHOD ( CHANGE NAME LATER )
 int echo(char* var); // NEW METHOD
-int my_ls(); // NEW METHOD
+// int my_ls(); // NEW METHOD
 int print(char* var);
 int run(char* script);
 int badcommandFileDoesNotExist();
 int badcommandTooManyTokens(); // NEW METHOD
-
 
 
 // Interpret commands and their arguments
@@ -30,7 +29,10 @@ int interpreter(char* command_args[], int args_size){
 		return badcommand();
 	}
 
-
+	// Check for multiple commands
+	// Push commands into a file
+	// Run file in batch mode
+	// Delete file
 	for ( i=0; i<args_size; i++){ //strip spaces new line etc
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
 	}
@@ -60,9 +62,10 @@ int interpreter(char* command_args[], int args_size){
 		if (args_size != 2) return badcommand();
 		return echo(command_args[1]);
 
-	} else if (strcmp(command_args[0], "my_ls")==0) {
-		if (args_size != 1) return badcommand();
-		return my_ls();
+	// }
+	// else if (strcmp(command_args[0], "my_ls")==0) {
+	// 	if (args_size != 1) return badcommand();
+	// 	return my_ls();
 
 	} else if (strcmp(command_args[0], "print")==0) {
 		if (args_size != 2) return badcommand();
@@ -176,26 +179,26 @@ int echo(char* var){
 	return 0;
 }
 
-int my_ls(){
+// int my_ls(){
 
-	DIR *d;
-	struct dirent *dir;
-	char* list[];
-    int count = 0;
+// 	DIR *d;
+// 	struct dirent *dir;
+// 	char* list[];
+//     int count = 0;
 
-	d = opendir(".");
-	if (d) {
+// 	d = opendir(".");
+// 	if (d) {
 
-		while ((dir = readdir(d)) != NULL){
-			printf("%s\n", dir->d_name);
-			list[count] = dir->d_name;
-            count++;
-		}
-		closedir(d);
-	}
+// 		while ((dir = readdir(d)) != NULL){
+// 			printf("%s\n", dir->d_name);
+// 			list[count] = dir->d_name;
+//             count++;
+// 		}
+// 		closedir(d);
+// 	}
 
-	return 0;
-}
+// 	return 0;
+// }
 
 
 int print(char* var){
