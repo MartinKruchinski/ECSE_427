@@ -1,21 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
 
 #include "shellmemory.h"
 #include "shell.h"
 
-int MAX_ARGS_SIZE = 7; // CHANGED FROM 3 TO 7
+int MAX_ARGS_SIZE = 100; // CHANGED FROM 3 TO 7
 
 int help();
 int quit();
 int badcommand();
 int set(char* var, char* value);
 int set2(char* var, char* values[], int size); // NEW METHOD ( CHANGE NAME LATER )
+int echo(char* var); // NEW METHOD
+int my_ls(); // NEW METHOD
 int print(char* var);
 int run(char* script);
 int badcommandFileDoesNotExist();
 int badcommandTooManyTokens(); // NEW METHOD
+
 
 
 // Interpret commands and their arguments
@@ -51,6 +55,14 @@ int interpreter(char* command_args[], int args_size){
 		// NEW CODE
 		if (args_size > 7) return badcommandTooManyTokens();
 		return set2(command_args[1], command_args, args_size); // Here we need to pass all the params that can be included in the set, along with args size
+
+	} else if (strcmp(command_args[0], "echo")==0) {
+		if (args_size != 2) return badcommand();
+		return echo(command_args[1]);
+
+	} else if (strcmp(command_args[0], "my_ls")==0) {
+		if (args_size != 1) return badcommand();
+		return my_ls();
 
 	} else if (strcmp(command_args[0], "print")==0) {
 		if (args_size != 2) return badcommand();
@@ -143,6 +155,48 @@ int set2(char* var, char* values[], int size){
 
 	return 0;
 }
+
+int echo(char* var){
+
+	char firstChar = var[0];
+	char* first = malloc(2*sizeof(char));
+	first[0] = firstChar;
+	first[1] = '\0';
+
+	if (strcmp(first, "$") == 0) {
+		if(strcmp(mem_get_value(var+1), "Variable does not exist") == 0){
+			printf("\n");
+		} else {
+			printf("%s\n", mem_get_value(var+1));
+		}
+	} else {
+		printf("%s\n", var);
+	}
+
+	return 0;
+}
+
+int my_ls(){
+
+	DIR *d;
+	struct dirent *dir;
+	char* list[];
+    int count = 0;
+
+	d = opendir(".");
+	if (d) {
+
+		while ((dir = readdir(d)) != NULL){
+			printf("%s\n", dir->d_name);
+			list[count] = dir->d_name;
+            count++;
+		}
+		closedir(d);
+	}
+
+	return 0;
+}
+
 
 int print(char* var){
 	printf("%s\n", mem_get_value(var));
