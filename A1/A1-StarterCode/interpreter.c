@@ -59,8 +59,8 @@ int interpreter(char* command_args[], int args_size) {
 	
 	// printf("%s\n", inputArray[0][0]);
 	// printf("%s\n", inputArray[0][1]);
-	printf("%s\n", inputArray[1][0]);
-	printf("%s\n", inputArray[1][1]);
+	// printf("%s\n", inputArray[1][0]);
+	// printf("%s\n", inputArray[1][1]);
 
 	// Check for multiple commands
 	// Push commands into a file
@@ -97,22 +97,22 @@ int interpreter(char* command_args[], int args_size) {
 			if (inputArray[a][6] != NULL) return badcommandTooManyTokens();
 			return set2(command_args[1], command_args, args_size); // Here we need to pass all the params that can be included in the set, along with args size
 
-		} else if (strcmp(command_args[0], "echo")==0) {
-			if (args_size != 2) return badcommand();
-			return echo(command_args[1]);
+		} else if (strcmp(inputArray[a][0], "echo")==0) {
+			if (inputArray[a][2] != NULL) return badcommand();
+			return echo(inputArray[a][1]);
 
 		}
-		else if (strcmp(command_args[0], "my_ls")==0) {
-			if (args_size != 1) return badcommand();
+		else if (strcmp(inputArray[a][0], "my_ls")==0) {
+			if (inputArray[a][1] != NULL) return badcommand();
 			return my_ls();
 
-		} else if (strcmp(command_args[0], "print")==0) {
-			if (args_size != 2) return badcommand();
-			return print(command_args[1]);
+		} else if (strcmp(inputArray[a][0], "print")==0) {
+			if (inputArray[a][2] != NULL) return badcommand();
+			return print(inputArray[a][1]);
 
-		} else if (strcmp(command_args[0], "run")==0) {
-			if (args_size != 2) return badcommand();
-			return run(command_args[1]);
+		} else if (strcmp(inputArray[a][0], "run")==0) {
+			if (inputArray[a][2] != NULL) return badcommand();
+			return run(inputArray[a][1]);
 
 		} else return badcommand();
 	}
