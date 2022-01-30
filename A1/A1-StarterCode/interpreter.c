@@ -22,10 +22,10 @@ int badcommandTooManyTokens(); // NEW METHOD
 
 
 // Interpret commands and their arguments
-int interpreter(char* command_args[], int args_size){
+int interpreter(char* command_args[], int args_size) {
 	int i;
 
-	if ( args_size < 1 || args_size > MAX_ARGS_SIZE){
+	if ( args_size < 1 || args_size > MAX_ARGS_SIZE) {
 		return badcommand();
 	}
 
@@ -33,11 +33,11 @@ int interpreter(char* command_args[], int args_size){
 	// Push commands into a file
 	// Run file in batch mode
 	// Delete file
-	for ( i=0; i<args_size; i++){ //strip spaces new line etc
+	for ( i=0; i<args_size; i++) { //strip spaces new line etc
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
 	}
 
-	if (strcmp(command_args[0], "help")==0){
+	if (strcmp(command_args[0], "help")==0) {
 	    //help
 	    if (args_size != 1) return badcommand();
 	    return help();
@@ -78,7 +78,7 @@ int interpreter(char* command_args[], int args_size){
 	} else return badcommand();
 }
 
-int help(){
+int help() {
 
 	char help_string[] = "COMMAND			DESCRIPTION\n \
 help			Displays all the commands\n \
@@ -90,29 +90,29 @@ run SCRIPT.TXT		Executes the file SCRIPT.TXT\n ";
 	return 0;
 }
 
-int quit(){
+int quit() {
 	printf("%s\n", "Bye!");
 	exit(0);
 }
 
-int badcommand(){
+int badcommand() {
 	printf("%s\n", "Unknown Command");
 	return 1;
 }
 
 // For run command only
-int badcommandFileDoesNotExist(){
+int badcommandFileDoesNotExist() {
 	printf("%s\n", "Bad command: File not found");
 	return 3;
 }
 
 // For set command only
-int badcommandTooManyTokens(){
+int badcommandTooManyTokens() {
 	printf("%s\n", "Bad command: Too many tokens");
 	return 2;
 }
 
-int set(char* var, char* value){
+int set(char* var, char* value) {
 
 	char *link = "=";
 	char buffer[1000];
@@ -136,12 +136,12 @@ int set(char* var, char* value){
 	$ print x
  	20 bob alice toto xyz
 **/
-int set2(char* var, char* values[], int size){
+int set2(char* var, char* values[], int size) {
 
 	int i = 2;
 	char *newValue = (char *)malloc(0);
 
-	for (i; i < size - 1; i++){
+	for (i; i < size - 1; i++) {
 		strcat(newValue, values[i]);
 		strcat(newValue, " ");
 	}
@@ -159,7 +159,7 @@ int set2(char* var, char* values[], int size){
 	return 0;
 }
 
-int echo(char* var){
+int echo(char* var) {
 
 	char firstChar = var[0];
 	char* first = malloc(2*sizeof(char));
@@ -167,7 +167,7 @@ int echo(char* var){
 	first[1] = '\0';
 
 	if (strcmp(first, "$") == 0) {
-		if(strcmp(mem_get_value(var+1), "Variable does not exist") == 0){
+		if(strcmp(mem_get_value(var+1), "Variable does not exist") == 0) {
 			printf("\n");
 		} else {
 			printf("%s\n", mem_get_value(var+1));
@@ -179,48 +179,66 @@ int echo(char* var){
 	return 0;
 }
 
-int my_ls(){
+int my_ls() {
 
 	DIR *d;
 	struct dirent *dir;
-	// char* list[];
-    // int count = 0;
+
+	char *list[100];
+	char *tmp;
+
+	int i;
+	int count = 0;
 
 	d = opendir(".");
 	if (d) {
 
-		while ((dir = readdir(d)) != NULL){
-			printf("%s\n", dir->d_name);
-			// list[count] = dir->d_name;
-            // count++;
+		while ((dir = readdir(d)) != NULL) {
+
+			list[count] = dir->d_name;
+			count++;
+		}
+
+		for (i=0; list[i]; i++) {
+			for (int j=0; list[j]; j++) {
+				if (strcmp(list[i], list[j]) < 0) {
+					tmp = list[i];
+					list[i] = list[j];
+					list[j] = tmp;
+				}
+			}
 		}
 		closedir(d);
+
+		for (i = 0; i < count; i++) {
+			printf("%s\n", list[i]);
+		}
 	}
 
 	return 0;
 }
 
 
-int print(char* var){
+int print(char* var) {
 	printf("%s\n", mem_get_value(var));
 	return 0;
 }
 
-int run(char* script){
+int run(char* script) {
 	int errCode = 0;
 	char line[1000];
 	FILE *p = fopen(script,"rt");  // the program is in a file
 
-	if(p == NULL){
+	if(p == NULL) {
 		return badcommandFileDoesNotExist();
 	}
 
 	fgets(line,999,p);
-	while(1){
+	while(1) {
 		errCode = parseInput(line);	// which calls interpreter()
 		memset(line, 0, sizeof(line));
 
-		if(feof(p)){
+		if(feof(p)) {
 			break;
 		}
 		fgets(line,999,p);
