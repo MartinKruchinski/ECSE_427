@@ -24,58 +24,98 @@ int badcommandTooManyTokens(); // NEW METHOD
 // Interpret commands and their arguments
 int interpreter(char* command_args[], int args_size) {
 	int i;
+	int nCommandWords = 0;
+	int nCommands = 0;
+	char * inputArray[10][10] = {0};
 
 	if ( args_size < 1 || args_size > MAX_ARGS_SIZE) {
 		return badcommand();
 	}
 
+	for(int k=0; k < args_size; k++){
+		if(strcmp(command_args[k], ";") == 0){
+			nCommands++;
+			nCommandWords = 0;
+		}
+		else if(strchr(command_args[k], ';') != NULL){
+			char tempString[strlen(command_args[k])];
+			command_args[k][strlen(command_args[k]) -1] = '\0';
+			strcpy(tempString, command_args[k]);
+			printf("before: %s\n", tempString);
+			int sizeStr = strlen(command_args[k]);
+			printf("%d\n", sizeStr);
+			// tempString[sizeStr - 1] = '\0';
+			printf("after: %s\n", tempString);
+			inputArray[nCommands][nCommandWords] = command_args[k];
+			nCommands++;
+			nCommandWords = 0;
+		}
+		else {
+			inputArray[nCommands][nCommandWords] = command_args[k];
+			nCommandWords++;
+		}
+		
+	}
+	
+	// printf("%s\n", inputArray[0][0]);
+	// printf("%s\n", inputArray[0][1]);
+	printf("%s\n", inputArray[1][0]);
+	printf("%s\n", inputArray[1][1]);
+
 	// Check for multiple commands
 	// Push commands into a file
 	// Run file in batch mode
 	// Delete file
+	int a = 0;
+	int b = 0;
 	for ( i=0; i<args_size; i++) { //strip spaces new line etc
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
 	}
+	while(inputArray[a][0] != NULL){
 
-	if (strcmp(command_args[0], "help")==0) {
-	    //help
-	    if (args_size != 1) return badcommand();
-	    return help();
+		if (strcmp(inputArray[a][0], "help")==0) {
+			//help
+			printf("Getting here");
+			if (inputArray[a][1] != NULL) return badcommand();
+			a++;
+			help();
 
-	} else if (strcmp(command_args[0], "quit")==0) {
-		//quit
-		if (args_size != 1) return badcommand();
-		return quit();
+		} else if (strcmp(inputArray[a][0], "quit")==0) {
+			//quit
+			if (inputArray[a][1] != NULL) return badcommand();
+			a++;
+			quit();
 
-	} else if (strcmp(command_args[0], "set")==0) {
-		// printf("SET COMMAND");
+		} else if (strcmp(inputArray[a][0], "set")==0) {
+			// printf("SET COMMAND");
 
-		// OLD CODE
-		// if (args_size != 3) return badcommand();
-		// return set(command_args[1], command_args[2]);
+			// OLD CODE
+			// if (args_size != 3) return badcommand();
+			// return set(command_args[1], command_args[2]);
 
-		// NEW CODE
-		if (args_size > 7) return badcommandTooManyTokens();
-		return set2(command_args[1], command_args, args_size); // Here we need to pass all the params that can be included in the set, along with args size
+			// NEW CODE
+			if (inputArray[a][6] != NULL) return badcommandTooManyTokens();
+			return set2(command_args[1], command_args, args_size); // Here we need to pass all the params that can be included in the set, along with args size
 
-	} else if (strcmp(command_args[0], "echo")==0) {
-		if (args_size != 2) return badcommand();
-		return echo(command_args[1]);
+		} else if (strcmp(command_args[0], "echo")==0) {
+			if (args_size != 2) return badcommand();
+			return echo(command_args[1]);
 
+		}
+		else if (strcmp(command_args[0], "my_ls")==0) {
+			if (args_size != 1) return badcommand();
+			return my_ls();
+
+		} else if (strcmp(command_args[0], "print")==0) {
+			if (args_size != 2) return badcommand();
+			return print(command_args[1]);
+
+		} else if (strcmp(command_args[0], "run")==0) {
+			if (args_size != 2) return badcommand();
+			return run(command_args[1]);
+
+		} else return badcommand();
 	}
-	else if (strcmp(command_args[0], "my_ls")==0) {
-		if (args_size != 1) return badcommand();
-		return my_ls();
-
-	} else if (strcmp(command_args[0], "print")==0) {
-		if (args_size != 2) return badcommand();
-		return print(command_args[1]);
-
-	} else if (strcmp(command_args[0], "run")==0) {
-		if (args_size != 2) return badcommand();
-		return run(command_args[1]);
-
-	} else return badcommand();
 }
 
 int help() {
