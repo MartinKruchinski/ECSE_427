@@ -19,6 +19,7 @@ int print(char* var);
 int run(char* script);
 int badcommandFileDoesNotExist();
 int badcommandTooManyTokens(); // NEW METHOD
+int tooManyInstructions();
 
 
 // Interpret commands and their arguments
@@ -26,6 +27,7 @@ int interpreter(char* command_args[], int args_size) {
 	int i;
 	int nCommandWords = 0;
 	int nCommands = 0;
+	
 	char * inputArray[10][10] = {0};
 
 	if ( args_size < 1 || args_size > MAX_ARGS_SIZE) {
@@ -33,6 +35,9 @@ int interpreter(char* command_args[], int args_size) {
 	}
 
 	for(int k=0; k < args_size; k++){
+		if(nCommands == 10){
+			return tooManyInstructions();
+		}
 		if(strcmp(command_args[k], ";") == 0){
 			nCommands++;
 			nCommandWords = 0;
@@ -41,11 +46,7 @@ int interpreter(char* command_args[], int args_size) {
 			char tempString[strlen(command_args[k])];
 			command_args[k][strlen(command_args[k]) -1] = '\0';
 			strcpy(tempString, command_args[k]);
-			printf("before: %s\n", tempString);
 			int sizeStr = strlen(command_args[k]);
-			printf("%d\n", sizeStr);
-			// tempString[sizeStr - 1] = '\0';
-			printf("after: %s\n", tempString);
 			inputArray[nCommands][nCommandWords] = command_args[k];
 			nCommands++;
 			nCommandWords = 0;
@@ -67,7 +68,6 @@ int interpreter(char* command_args[], int args_size) {
 	// Run file in batch mode
 	// Delete file
 	int a = 0;
-	int b = 0;
 	for ( i=0; i<args_size; i++) { //strip spaces new line etc
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
 	}
@@ -95,24 +95,29 @@ int interpreter(char* command_args[], int args_size) {
 
 			// NEW CODE
 			if (inputArray[a][6] != NULL) return badcommandTooManyTokens();
-			return set2(command_args[1], command_args, args_size); // Here we need to pass all the params that can be included in the set, along with args size
+			set2(command_args[1], command_args, args_size); // Here we need to pass all the params that can be included in the set, along with args size
+			a++;
 
 		} else if (strcmp(inputArray[a][0], "echo")==0) {
 			if (inputArray[a][2] != NULL) return badcommand();
-			return echo(inputArray[a][1]);
+			echo(inputArray[a][1]);
+			a++;
 
 		}
 		else if (strcmp(inputArray[a][0], "my_ls")==0) {
 			if (inputArray[a][1] != NULL) return badcommand();
-			return my_ls();
+			my_ls();
+			a++;
 
 		} else if (strcmp(inputArray[a][0], "print")==0) {
 			if (inputArray[a][2] != NULL) return badcommand();
-			return print(inputArray[a][1]);
+			print(inputArray[a][1]);
+			a++;
 
 		} else if (strcmp(inputArray[a][0], "run")==0) {
 			if (inputArray[a][2] != NULL) return badcommand();
-			return run(inputArray[a][1]);
+			run(inputArray[a][1]);
+			a++;
 
 		} else return badcommand();
 	}
@@ -144,6 +149,11 @@ int badcommand() {
 int badcommandFileDoesNotExist() {
 	printf("%s\n", "Bad command: File not found");
 	return 3;
+}
+
+int tooManyInstructions(){
+	printf("%s\n", "Too many chained instructions");
+	return 1;
 }
 
 // For set command only
