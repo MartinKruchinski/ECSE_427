@@ -6,13 +6,13 @@
 #include "shellmemory.h"
 #include "shell.h"
 
-int MAX_ARGS_SIZE = 100; // CHANGED FROM 3 TO 7
+int MAX_ARGS_SIZE = 100; // CHANGED FROM 3 TO 100
 
 int help();
 int quit();
 int badcommand();
 int set(char* var, char* value);
-int set2(char* var, char* values[], int size); // NEW METHOD ( CHANGE NAME LATER )
+int set2(char* var, char* value); // NEW METHOD ( CHANGE NAME LATER )
 int echo(char* var); // NEW METHOD
 int my_ls(); // NEW METHOD
 int print(char* var);
@@ -27,7 +27,7 @@ int interpreter(char* command_args[], int args_size) {
 	int i;
 	int nCommandWords = 0;
 	int nCommands = 0;
-	
+
 	char * inputArray[10][10] = {0};
 
 	if ( args_size < 1 || args_size > MAX_ARGS_SIZE) {
@@ -55,18 +55,9 @@ int interpreter(char* command_args[], int args_size) {
 			inputArray[nCommands][nCommandWords] = command_args[k];
 			nCommandWords++;
 		}
-		
-	}
-	
-	// printf("%s\n", inputArray[0][0]);
-	// printf("%s\n", inputArray[0][1]);
-	// printf("%s\n", inputArray[1][0]);
-	// printf("%s\n", inputArray[1][1]);
 
-	// Check for multiple commands
-	// Push commands into a file
-	// Run file in batch mode
-	// Delete file
+	}
+
 	int a = 0;
 	for ( i=0; i<args_size; i++) { //strip spaces new line etc
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
@@ -75,7 +66,6 @@ int interpreter(char* command_args[], int args_size) {
 
 		if (strcmp(inputArray[a][0], "help")==0) {
 			//help
-			printf("Getting here");
 			if (inputArray[a][1] != NULL) return badcommand();
 			a++;
 			help();
@@ -87,15 +77,19 @@ int interpreter(char* command_args[], int args_size) {
 			quit();
 
 		} else if (strcmp(inputArray[a][0], "set")==0) {
-			// printf("SET COMMAND");
-
-			// OLD CODE
-			// if (args_size != 3) return badcommand();
-			// return set(command_args[1], command_args[2]);
 
 			// NEW CODE
 			if (inputArray[a][6] != NULL) return badcommandTooManyTokens();
-			set2(command_args[1], command_args, args_size); // Here we need to pass all the params that can be included in the set, along with args size
+
+			int i = 2;
+			char *newValue = (char *)malloc(0);
+
+			for (i; inputArray[a][i]; i++) {
+				strcat(newValue, inputArray[a][i]);
+				strcat(newValue, " ");
+			}
+
+			set2(command_args[1], newValue); // Here we need to pass all the params that can be included in the set, along with args size
 			a++;
 
 		} else if (strcmp(inputArray[a][0], "echo")==0) {
@@ -186,25 +180,15 @@ int set(char* var, char* value) {
 	$ print x
  	20 bob alice toto xyz
 **/
-int set2(char* var, char* values[], int size) {
-
-	int i = 2;
-	char *newValue = (char *)malloc(0);
-
-	for (i; i < size - 1; i++) {
-		strcat(newValue, values[i]);
-		strcat(newValue, " ");
-	}
-
-	strcat(newValue, values[i]); // Append last value without the space
+int set2(char* var, char* value) {
 
 	char *link = "=";
 	char buffer[1000];
 	strcpy(buffer, var);
 	strcat(buffer, link);
-	strcat(buffer, newValue);
+	strcat(buffer, value);
 
-	mem_set_value(var, newValue);
+	mem_set_value(var, value);
 
 	return 0;
 }
