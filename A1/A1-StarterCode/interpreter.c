@@ -119,6 +119,9 @@ int interpreter(char* command_args[], int args_size) {
 			run(inputArray[a][1]);
 			a++;
 
+		} else if (EOF){
+			freopen("/dev/tty", "r", stdin);
+			return 0;
 		} else return badcommand();
 	}
 }
