@@ -20,6 +20,7 @@ int run(char* script);
 int badcommandFileDoesNotExist();
 int badcommandTooManyTokens(); // NEW METHOD
 int tooManyInstructions();
+int invalidCommand();
 
 
 // Interpret commands and their arguments
@@ -63,8 +64,11 @@ int interpreter(char* command_args[], int args_size) {
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
 	}
 	while(inputArray[a][0] != NULL){
-
-		if (strcmp(inputArray[a][0], "help")==0) {
+		// if (EOF){
+		// 	freopen("/dev/tty", "r", stdin);
+		// 	return 0;
+		// }
+		 if (strcmp(inputArray[a][0], "help")==0) {
 			//help
 			if (inputArray[a][1] != NULL) return badcommand();
 			a++;
@@ -79,7 +83,7 @@ int interpreter(char* command_args[], int args_size) {
 		} else if (strcmp(inputArray[a][0], "set")==0) {
 
 			// NEW CODE
-			if (inputArray[a][6] != NULL) return badcommandTooManyTokens();
+			if (inputArray[a][7] != NULL) return badcommandTooManyTokens();
 
 			int i = 2;
 			char *newValue = (char *)malloc(0);
@@ -89,11 +93,12 @@ int interpreter(char* command_args[], int args_size) {
 				strcat(newValue, " ");
 			}
 
-			set2(command_args[1], newValue); // Here we need to pass all the params that can be included in the set, along with args size
+			set2(inputArray[a][1], newValue); // Here we need to pass all the params that can be included in the set, along with args size
 			a++;
 
 		} else if (strcmp(inputArray[a][0], "echo")==0) {
-			if (inputArray[a][2] != NULL) return badcommand();
+			if (inputArray[a][2] != NULL) return invalidCommand();
+			if(inputArray[a][1] == NULL || strcmp(inputArray[a][1], " ")) return invalidCommand();
 			echo(inputArray[a][1]);
 			a++;
 
@@ -113,9 +118,7 @@ int interpreter(char* command_args[], int args_size) {
 			run(inputArray[a][1]);
 			a++;
 
-		} else if (EOF){
-			freopen("/dev/tty", "r", stdin);
-			return 0;
+		
 		} else return badcommand();
 	}
 }
@@ -157,6 +160,11 @@ int tooManyInstructions(){
 int badcommandTooManyTokens() {
 	printf("%s\n", "Bad command: Too many tokens");
 	return 2;
+}
+
+int invalidCommand(){
+	printf("%s\n", "Invalid command.");
+	return 4;
 }
 
 int set(char* var, char* value) {
