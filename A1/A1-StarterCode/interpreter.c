@@ -21,7 +21,7 @@ int badcommandFileDoesNotExist();
 int badcommandTooManyTokens(); // NEW METHOD
 int tooManyInstructions();
 int invalidCommand();
-
+int endofthefile();
 
 // Interpret commands and their arguments
 int interpreter(char* command_args[], int args_size) {
@@ -31,8 +31,12 @@ int interpreter(char* command_args[], int args_size) {
 
 	char * inputArray[10][10] = {0};
 
-	if ( args_size < 1 || args_size > MAX_ARGS_SIZE) {
+
+	if (args_size > MAX_ARGS_SIZE) {
 		return badcommand();
+	}
+	if(args_size < 1){
+		return endofthefile();
 	}
 
 	for(int k=0; k < args_size; k++){
@@ -64,10 +68,6 @@ int interpreter(char* command_args[], int args_size) {
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
 	}
 	while(inputArray[a][0] != NULL){
-		// if (EOF){
-		// 	freopen("/dev/tty", "r", stdin);
-		// 	return 0;
-		// }
 		 if (strcmp(inputArray[a][0], "help")==0) {
 			//help
 			if (inputArray[a][1] != NULL) return badcommand();
@@ -98,7 +98,7 @@ int interpreter(char* command_args[], int args_size) {
 
 		} else if (strcmp(inputArray[a][0], "echo")==0) {
 			if (inputArray[a][2] != NULL) return invalidCommand();
-			if(inputArray[a][1] == NULL || strcmp(inputArray[a][1], " ")) return invalidCommand();
+			if(inputArray[a][1] == NULL || strcmp(inputArray[a][1], " ")==0) return invalidCommand();
 			echo(inputArray[a][1]);
 			a++;
 
@@ -143,6 +143,11 @@ int quit() {
 int badcommand() {
 	printf("%s\n", "Unknown Command");
 	return 1;
+}
+
+int endofthefile(){
+	freopen("/dev/tty", "r", stdin);
+	return 0;
 }
 
 // For run command only
