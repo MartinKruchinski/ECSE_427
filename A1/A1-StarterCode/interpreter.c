@@ -12,7 +12,6 @@ int help();
 int quit();
 int badcommand();
 int set(char* var, char* value);
-int set2(char* var, char* value); // NEW METHOD ( CHANGE NAME LATER )
 int echo(char* var); // NEW METHOD
 int my_ls(); // NEW METHOD
 int print(char* var);
@@ -93,7 +92,7 @@ int interpreter(char* command_args[], int args_size) {
 				strcat(newValue, " ");
 			}
 
-			set2(inputArray[a][1], newValue); // Here we need to pass all the params that can be included in the set, along with args size
+			set(inputArray[a][1], newValue); // Here we need to pass all the params that can be included in the set, along with args size
 			a++;
 
 		} else if (strcmp(inputArray[a][0], "echo")==0) {
@@ -118,7 +117,7 @@ int interpreter(char* command_args[], int args_size) {
 			run(inputArray[a][1]);
 			a++;
 
-		
+
 		} else return badcommand();
 	}
 }
@@ -172,20 +171,6 @@ int invalidCommand(){
 	return 4;
 }
 
-int set(char* var, char* value) {
-
-	char *link = "=";
-	char buffer[1000];
-	strcpy(buffer, var);
-	strcat(buffer, link);
-	strcat(buffer, value);
-
-	mem_set_value(var, value);
-
-	return 0;
-
-}
-
 /**
 	This method is used for when there are multiple words for a variable
 	$ set x 20 bob alice toto xyz
@@ -196,7 +181,7 @@ int set(char* var, char* value) {
 	$ print x
  	20 bob alice toto xyz
 **/
-int set2(char* var, char* value) {
+int set(char* var, char* value) {
 
 	char *link = "=";
 	char buffer[1000];
