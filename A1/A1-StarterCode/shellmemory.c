@@ -38,7 +38,7 @@ char *extract(char *model) {
 void mem_init(){
 
 	int i;
-	for (i=0; i<1000; i++){		
+	for (i=0; i<1000; i++){
 		shellmemory[i].var = "none";
 		shellmemory[i].value = "none";
 	}
@@ -46,23 +46,27 @@ void mem_init(){
 
 // Set key value pair
 void mem_set_value(char *var_in, char *value_in) {
-	
+
 	int i;
 
 	for (i=0; i<1000; i++){
+
 		if (strcmp(shellmemory[i].var, var_in) == 0){
-			shellmemory[i].value = strdup(value_in);
+			shellmemory[i].value = malloc((strlen(value_in) + 1)* sizeof(char));
+			shellmemory[i].value = value_in;
+			shellmemory[i].value[strlen(value_in)] = '\0';
 			return;
-		} 
+		}
 	}
 
 	//Value does not exist, need to find a free spot.
 	for (i=0; i<1000; i++){
+
 		if (strcmp(shellmemory[i].var, "none") == 0){
 			shellmemory[i].var = strdup(var_in);
 			shellmemory[i].value = strdup(value_in);
 			return;
-		} 
+		}
 	}
 
 	return;
@@ -77,7 +81,7 @@ char *mem_get_value(char *var_in) {
 		if (strcmp(shellmemory[i].var, var_in) == 0){
 
 			return strdup(shellmemory[i].value);
-		} 
+		}
 	}
 	return "Variable does not exist";
 

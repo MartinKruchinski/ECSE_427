@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+#include <ctype.h>
 
 #include "shellmemory.h"
 #include "shell.h"
@@ -149,6 +150,12 @@ int endofthefile(){
 	return 0;
 }
 
+// For non-alphanumeric in set command
+int notalphanum(){
+	printf("%s\n", "Bad Command: Only alphanumeric tokens allowed");
+	return 0;
+}
+
 // For run command only
 int badcommandFileDoesNotExist() {
 	printf("%s\n", "Bad command: File not found");
@@ -189,6 +196,13 @@ int set(char* var, char* value) {
 	strcat(buffer, link);
 	strcat(buffer, value);
 
+	for (int i = 0; i < strlen(value); i++){
+		if (!isalnum(value[i]) && !isspace(value[i])) {
+			notalphanum();
+			return 1;
+		}
+	}
+
 	mem_set_value(var, value);
 
 	return 0;
@@ -202,12 +216,30 @@ int echo(char* var) {
 	first[1] = '\0';
 
 	if (strcmp(first, "$") == 0) {
+
+		if (strlen(var) == 1){
+			notalphanum();
+			return 1;
+		}
+
+		for (int i = 1; i < strlen(var); i++){
+			if (!isalnum(var[i]) && !isspace(var[i])) {
+				notalphanum();
+				return 1;
+			}
+		}
 		if(strcmp(mem_get_value(var+1), "Variable does not exist") == 0) {
 			printf("\n");
 		} else {
 			printf("%s\n", mem_get_value(var+1));
 		}
 	} else {
+		for (int i = 0; i < strlen(var); i++){
+			if (!isalnum(var[i]) && !isspace(var[i])) {
+				notalphanum();
+				return 1;
+			}
+		}
 		printf("%s\n", var);
 	}
 
