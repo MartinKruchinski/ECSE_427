@@ -1,6 +1,6 @@
 Assignment 1 ECSE 427.
 Authors:
-Martin Kruchinski
+Martin Kruchinski 260915767
 Saba Fathi 260972570
 
 This file contains the explanation of all relevant methods.
