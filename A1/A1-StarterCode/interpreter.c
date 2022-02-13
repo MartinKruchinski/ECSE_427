@@ -202,7 +202,12 @@ int set(char* var, char* value) {
 			return 1;
 		}
 	}
-
+	for (int i = 0; i < strlen(var); i++){
+		if (!isalnum(var[i]) && !isspace(var[i])) {
+			notalphanum();
+			return 1;
+		}
+	}
 	mem_set_value(var, value);
 
 	return 0;
