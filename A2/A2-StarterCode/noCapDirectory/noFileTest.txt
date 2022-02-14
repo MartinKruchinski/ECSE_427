@@ -1,0 +1,6 @@
+echo noFileTest
+set NEW_VAR testing test
+set OTHER_VAR other var is here
+run DirectoryMoment/fileDoesNotExist.txt
+set INVALID_VAR invalid var is this one var here
+print OTHER_VAR
