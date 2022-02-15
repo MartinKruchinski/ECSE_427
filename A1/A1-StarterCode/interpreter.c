@@ -15,6 +15,7 @@ int badcommand();
 int set(char* var, char* value);
 int echo(char* var); // NEW METHOD
 int my_ls(); // NEW METHOD
+char* tolowercase(char* str); // NEW METHOD
 int print(char* var);
 int run(char* script);
 int badcommandFileDoesNotExist();
@@ -271,13 +272,19 @@ int my_ls() {
 			count++;
 		}
 
-		for (i=0; list[i]; i++) {
-			for (int j=0; list[j]; j++) {
-				if (strcmp(list[i], list[j]) < 0) {
+		for (i=0; i < count; i++) {
+			for (int j=0; j < count; j++) {
+				char* curI = strdup(list[i]);
+				char* curJ = strdup(list[j]);
+
+				if (strcmp(tolowercase(curI), tolowercase(curJ)) < 0) {
 					tmp = list[i];
 					list[i] = list[j];
 					list[j] = tmp;
 				}
+
+				free(curI);
+				free(curJ);
 			}
 		}
 		closedir(d);
@@ -288,6 +295,17 @@ int my_ls() {
 	}
 
 	return 0;
+}
+
+// custom tolowercase because was getting issues with built in
+char* tolowercase(char* str){
+
+	for (int x = 0 ; x <= strlen(str) ; x++) {
+		if (str[x] >= 65 && str[x] <= 90) {
+			str[x]=str[x]+32;
+		}
+   }
+   return str;
 }
 
 

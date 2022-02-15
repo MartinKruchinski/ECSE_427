@@ -15,3 +15,6 @@ including hidden files and parent directory. The alphabetical order of our my_ls
 
 badCommandTooManyTokens:
 This command is called when too many arguments are passed to the set method, in which the limit is 5 arguments for 1 variable.
+
+tolowercase:
+custom tolowercase because was getting issues with built in
