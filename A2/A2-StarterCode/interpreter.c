@@ -8,6 +8,7 @@
 #include "shell.h"
 
 int MAX_ARGS_SIZE = 100; // CHANGED FROM 3 TO 100
+int UNIQUE_PID = 0;
 
 int help();
 int quit();
@@ -296,10 +297,31 @@ int print(char* var) {
 	return 0;
 }
 
+struct memoryLocation{
+	int position;
+	int length;
+};
+
+struct PCB {
+	int PID; //has to be unique
+	struct memoryLocation location; //start position and length of script
+	int currentInstruction;
+};
+
+struct readyQueue {
+	struct PCB *head;
+	struct PCB *current;
+	struct PCB *next;
+};
+
+
 int run(char* script) {
 	int errCode = 0;
 	char line[1000];
 	FILE *p = fopen(script,"rt");  // the program is in a file
+	size_t lineS = 0;
+
+	char allCommands[10000]; //Holds all the commands in the file separated by a ;
 
 	if(p == NULL) {
 		return badcommandFileDoesNotExist();
@@ -308,8 +330,10 @@ int run(char* script) {
 	fgets(line,999,p);
 	while(1) {
 		errCode = parseInput(line);	// which calls interpreter()
-		memset(line, 0, sizeof(line));
-
+		//  memset(line, 0, sizeof(line));
+		strcat(allCommands, line);
+		strcat(allCommands, "; ");
+		lineS = lineS + sizeof(line);
 		if(feof(p)) {
 			break;
 		}
@@ -317,6 +341,18 @@ int run(char* script) {
 	}
 
     fclose(p);
-
+	printf("%s\n", allCommands);
+	memset(allCommands, 0, sizeof(allCommands));
+	int pos = mem_get_location(allCommands);
+	struct memoryLocation memloc = {
+		.position = pos,
+		.length = lineS
+	};
+	UNIQUE_PID = UNIQUE_PID + 1;
+	struct PCB pcb1 = {
+		.PID = UNIQUE_PID,
+		.location = memloc,
+		.currentInstruction = pos
+	};
 	return errCode;
 }
