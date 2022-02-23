@@ -18,6 +18,7 @@ int print(char* var);
 int run(char* script);
 int my_ls();
 int echo();
+int exec(char* scripts[], int size);
 
 int interpreter(char* command_args[], int args_size){
 	int i;
@@ -73,6 +74,11 @@ int interpreter(char* command_args[], int args_size){
 		if (args_size > 2) return badcommand();
 		return echo(command_args[1]);
 	
+	}
+	else if(strcmp(command_args[0], "exec") == 0){
+		if(args_size < 3) return badcommand();
+		if(args_size > 5) return badcommand();
+		exec(command_args, args_size);
 	} else return badcommand();
 }
 
@@ -159,8 +165,10 @@ typedef struct pcb {
 
 
 int run(char* script) {
+	printf("%s\n", script);
 	int errCode = 0;
 	char line[1000];
+	strcat("../A2_testcases_public/", script);
 	FILE *p = fopen(script,"rt");  // the program is in a file
 	size_t lineS = 0;
 	int lineCtr = 0;
@@ -221,4 +229,31 @@ int run(char* script) {
 
 	return errCode;
 		
+}
+
+int exec(char* scripts[], int size) {
+	
+	if(strcmp(scripts[size-1], "FCFS") == 0){
+		if(size == 3){
+			return run(scripts[1]);
+		}
+		else {
+			for (int i = 1; i < size -1; i++)
+			{
+				run(scripts[i]);
+			}
+			return 0;
+			
+		}
+	}
+	else if(strcmp(scripts[size-1], "SJF") == 0){
+
+	} 
+	else if(strcmp(scripts[size-1], "RR") == 0){
+
+	}
+	else if(strcmp(scripts[size-1], "AGING") == 0){
+
+	}
+	else return  badcommand();
 }
