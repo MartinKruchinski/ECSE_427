@@ -106,7 +106,6 @@ void mem_free_space(int start, int length){
 	{
 		shellmemory[i].var = "none";
 		shellmemory[i].value = "none";
-		// printf("%s\n", shellmemory[i].var);
 	}
 
 }

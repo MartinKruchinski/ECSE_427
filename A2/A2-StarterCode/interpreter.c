@@ -71,7 +71,13 @@ int interpreter(char* command_args[], int args_size){
 		return my_ls();
 	
 	}else if (strcmp(command_args[0], "echo")==0) {
-		printf("%d\n",args_size);
+		for (int i = 0; i < args_size; i++)
+		{
+			// printf("Arg %d is %s\n", i, command_args[i]);
+			if(i == 2){
+			}
+		}
+		
 		if (args_size > 2) return badcommand();
 		return echo(command_args[1]);
 	
@@ -184,10 +190,16 @@ int run(char* script) {
 	fgets(line,999,p);
 	while(1) {
 		lineS = lineS + sizeof(line);
-		// errCode = parseInput(line);	// which calls interpreter()
+		
+		if(line[strlen(line)-1] != '\n'){
+			line[strlen(line)] = '\n';
+			line[strlen(line)+1] = '\0';
+		}
+
 		char string = lineCtr + '0';
 		char lineString[2] = "";
 		strncat(lineString ,&string, 1);
+		// printf("line is %s\n", line);
 		set(lineString,line);
 		lineCtr += 1;
 		if(feof(p)) {
@@ -221,7 +233,6 @@ int run(char* script) {
 			char in = i + '0';
 			char stPoint[2] = "";
 			strncat(stPoint ,&in, 1);
-			// printf("Input n is %d and command is %s\n", i, mem_get_value(stPoint) );
 			parseInput(mem_get_value(stPoint));
 			head->currentInstruction += 1;
 		}
@@ -234,12 +245,11 @@ int run(char* script) {
 }
 
 int exec(char* scripts[], int size) {
-	
-	if(strcmp(scripts[size-1], "FCFS") == 0){
-		if(size == 3){
+	if(size == 3){
 			return run(scripts[1]);
-		}
-		else {
+	}
+	else if(strcmp(scripts[size-1], "FCFS") == 0){
+		{
 			for (int i = 1; i < size -1; i++)
 			{
 				run(scripts[i]);
@@ -249,7 +259,11 @@ int exec(char* scripts[], int size) {
 		}
 	}
 	else if(strcmp(scripts[size-1], "SJF") == 0){
-
+		for (int i = 0; i < size; i++)
+		{
+				//sort saba
+		}
+		
 	} 
 	else if(strcmp(scripts[size-1], "RR") == 0){
 
