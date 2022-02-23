@@ -99,3 +99,14 @@ int mem_get_location(char *var_in) {
 	return -3;
 
 }
+
+void mem_free_space(int start, int length){
+	// printf("%d\n", start);
+	for (int i = start; i < length; i++)
+	{
+		shellmemory[i].var = "none";
+		shellmemory[i].value = "none";
+		// printf("%s\n", shellmemory[i].var);
+	}
+
+}
