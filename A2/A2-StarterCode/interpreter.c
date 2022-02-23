@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> 
+#include <string.h>
 
 #include "shellmemory.h"
 #include "shell.h"
@@ -13,6 +13,7 @@ int quit();
 int badcommand();
 int badcommandTooManyTokens();
 int badcommandFileDoesNotExist();
+int fileLength(char* file);
 int set(char* var, char* value);
 int print(char* var);
 int run(char* script);
@@ -38,7 +39,7 @@ int interpreter(char* command_args[], int args_size){
 	    //help
 	    if (args_size != 1) return badcommand();
 	    return help();
-	
+
 	} else if (strcmp(command_args[0], "quit")==0) {
 		//quit
 		if (args_size != 1) return badcommand();
@@ -57,30 +58,30 @@ int interpreter(char* command_args[], int args_size){
 			}
 		}
 		return set(command_args[1], value);
-	
+
 	} else if (strcmp(command_args[0], "print")==0) {
 		if (args_size != 2) return badcommand();
 		return print(command_args[1]);
-	
+
 	} else if (strcmp(command_args[0], "run")==0) {
 		if (args_size != 2) return badcommand();
 		return run(command_args[1]);
-	
+
 	} else if (strcmp(command_args[0], "my_ls")==0) {
 		if (args_size > 2) return badcommand();
 		return my_ls();
-	
+
 	}else if (strcmp(command_args[0], "echo")==0) {
-		for (int i = 0; i < args_size; i++)
-		{
-			// printf("Arg %d is %s\n", i, command_args[i]);
-			if(i == 2){
-			}
-		}
-		
+		// for (int i = 0; i < args_size; i++)
+		// {
+		// 	printf("Arg %d is %s\n", i, command_args[i]);
+		// 	if(i == 2){
+		// 	}
+		// }
+
 		if (args_size > 2) return badcommand();
 		return echo(command_args[1]);
-	
+
 	}
 	else if(strcmp(command_args[0], "exec") == 0){
 		if(args_size < 3) return badcommand();
@@ -136,7 +137,7 @@ int set(char* var, char* value){
 }
 
 int print(char* var){
-	printf("%s\n", mem_get_value(var)); 
+	printf("%s\n", mem_get_value(var));
 	return 0;
 }
 
@@ -149,11 +150,11 @@ int my_ls(){
 int echo(char* var){
 	if(var[0] == '$'){
 		var++;
-		printf("%s\n", mem_get_value(var)); 
+		printf("%s\n", mem_get_value(var));
 	}else{
-		printf("%s\n", var); 
+		printf("%s\n", var);
 	}
-	return 0; 
+	return 0;
 }
 
 struct memoryLocation{
@@ -167,8 +168,6 @@ typedef struct pcb {
 	int currentInstruction;
 	struct pcb *next;
 } pcb_t;
-
-
 
 
 int run(char* script) {
@@ -190,7 +189,7 @@ int run(char* script) {
 	fgets(line,999,p);
 	while(1) {
 		lineS = lineS + sizeof(line);
-		
+
 		if(line[strlen(line)-1] != '\n'){
 			line[strlen(line)] = '\n';
 			line[strlen(line)+1] = '\0';
@@ -228,7 +227,7 @@ int run(char* script) {
 	int m = 0;
 	while(head != NULL){
 		for (int i = head->location.position; i < head->location.length; i++)
-		{	
+		{
 			m++;
 			char in = i + '0';
 			char stPoint[2] = "";
@@ -241,7 +240,7 @@ int run(char* script) {
 	}
 
 	return errCode;
-		
+
 }
 
 int exec(char* scripts[], int size) {
@@ -249,22 +248,61 @@ int exec(char* scripts[], int size) {
 			return run(scripts[1]);
 	}
 	else if(strcmp(scripts[size-1], "FCFS") == 0){
+		for (int i = 1; i < size -1; i++)
 		{
-			for (int i = 1; i < size -1; i++)
-			{
-				run(scripts[i]);
-			}
-			return 0;
-			
+			run(scripts[i]);
 		}
+		return 0;
 	}
 	else if(strcmp(scripts[size-1], "SJF") == 0){
-		for (int i = 0; i < size; i++)
+
+		// Need to sort jobs
+		int lengths[3];
+		char* files[3];
+
+		for (int i = 1; i < size - 1; i++)
 		{
-				//sort saba
+			int length = fileLength(scripts[i]);
+			lengths[i - 1] = length;
+			scripts[i - 1] = scripts[i];
 		}
-		
-	} 
+
+		if (lengths[0] > lengths[2]) {
+			// swap
+			int tempLength = lengths[0];
+			char* tempScript = scripts[0];
+			lengths[0] = lengths[2];
+			scripts[0] = scripts[2];
+			lengths[2] = tempLength;
+			scripts[2] = tempScript;
+		}
+
+		if (lengths[0] > lengths[1]) {
+			// swap
+			int tempLength = lengths[0];
+			char* tempScript = scripts[0];
+			lengths[0] = lengths[1];
+			scripts[0] = scripts[1];
+			lengths[1] = tempLength;
+			scripts[1] = tempScript;
+		}
+
+		if (lengths[1] > lengths[2]) {
+			// swap
+			int tempLength = lengths[1];
+			char* tempScript = scripts[1];
+			lengths[1] = lengths[2];
+			scripts[1] = scripts[2];
+			lengths[2] = tempLength;
+			scripts[2] = tempScript;
+		}
+
+		for (int j = 0; j < 3; j++) {
+			run(scripts[j]);
+		}
+
+		return 0;
+	}
 	else if(strcmp(scripts[size-1], "RR") == 0){
 
 	}
@@ -272,4 +310,37 @@ int exec(char* scripts[], int size) {
 
 	}
 	else return  badcommand();
+}
+
+int fileLength(char* file) {
+	int errCode = 0;
+	char line[1000];
+	char address[] = "../A2_testcases_public/";
+	char* newAddress = "";
+	newAddress = strcat(address, file);
+	FILE *p = fopen(newAddress,"rt");  // the program is in a file
+	size_t lineS = 0;
+	int lineCtr = 0;
+
+	if(p == NULL) {
+		return badcommandFileDoesNotExist();
+	}
+
+	fgets(line,999,p);
+	while(1) {
+		lineS = lineS + sizeof(line);
+
+		if(line[strlen(line)-1] != '\n'){
+			line[strlen(line)] = '\n';
+			line[strlen(line)+1] = '\0';
+		}
+
+		lineCtr += 1;
+		if(feof(p)) {
+			break;
+		}
+		fgets(line,999,p);
+	}
+
+	return lineCtr;
 }
