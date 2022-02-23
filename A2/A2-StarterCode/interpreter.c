@@ -71,6 +71,7 @@ int interpreter(char* command_args[], int args_size){
 		return my_ls();
 	
 	}else if (strcmp(command_args[0], "echo")==0) {
+		printf("%d\n",args_size);
 		if (args_size > 2) return badcommand();
 		return echo(command_args[1]);
 	
@@ -165,11 +166,12 @@ typedef struct pcb {
 
 
 int run(char* script) {
-	printf("%s\n", script);
 	int errCode = 0;
 	char line[1000];
-	strcat("../A2_testcases_public/", script);
-	FILE *p = fopen(script,"rt");  // the program is in a file
+	char address[] = "../A2_testcases_public/";
+	char* newAddress = "";
+	newAddress = strcat(address, script);
+	FILE *p = fopen(newAddress,"rt");  // the program is in a file
 	size_t lineS = 0;
 	int lineCtr = 0;
 
@@ -186,7 +188,7 @@ int run(char* script) {
 		char string = lineCtr + '0';
 		char lineString[2] = "";
 		strncat(lineString ,&string, 1);
-		set(lineString, line);
+		set(lineString,line);
 		lineCtr += 1;
 		if(feof(p)) {
 			break;
@@ -212,7 +214,6 @@ int run(char* script) {
 	head->location = memloc;
 	head->next = NULL;
 	int m = 0;
-	// mem_free_space(0,6);
 	while(head != NULL){
 		for (int i = head->location.position; i < head->location.length; i++)
 		{	
@@ -220,6 +221,7 @@ int run(char* script) {
 			char in = i + '0';
 			char stPoint[2] = "";
 			strncat(stPoint ,&in, 1);
+			// printf("Input n is %d and command is %s\n", i, mem_get_value(stPoint) );
 			parseInput(mem_get_value(stPoint));
 			head->currentInstruction += 1;
 		}
