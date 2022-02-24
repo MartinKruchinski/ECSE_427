@@ -269,49 +269,77 @@ int exec(char* scripts[], int size) {
 	}
 	else if(strcmp(scripts[size-1], "SJF") == 0){
 
-		// Need to sort jobs
-		int lengths[3];
-		char* files[3];
+		if (size == 4) {
+			// Need to sort jobs
+			int lengths[2];
+			char* files[2];
 
-		for (int i = 1; i < size - 1; i++)
-		{
-			int length = fileLength(scripts[i]);
-			lengths[i - 1] = length;
-			scripts[i - 1] = scripts[i];
-		}
+			for (int i = 1; i < 3; i++)
+			{
+				int length = fileLength(scripts[i]);
+				lengths[i - 1] = length;
+				files[i - 1] = scripts[i];
+			}
+			if (lengths[0] > lengths[1]) {
+				// swap
+				int tempLength = lengths[0];
+				char* tempScript = files[0];
+				lengths[0] = lengths[1];
+				files[0] = files[1];
+				lengths[1] = tempLength;
+				files[1] = tempScript;
+			}
 
-		if (lengths[0] > lengths[2]) {
-			// swap
-			int tempLength = lengths[0];
-			char* tempScript = scripts[0];
-			lengths[0] = lengths[2];
-			scripts[0] = scripts[2];
-			lengths[2] = tempLength;
-			scripts[2] = tempScript;
-		}
+			for (int j = 0; files[j]; j++) {
+				run(files[j]);
+			}
+		} else {
 
-		if (lengths[0] > lengths[1]) {
-			// swap
-			int tempLength = lengths[0];
-			char* tempScript = scripts[0];
-			lengths[0] = lengths[1];
-			scripts[0] = scripts[1];
-			lengths[1] = tempLength;
-			scripts[1] = tempScript;
-		}
+			// Need to sort jobs
+			int lengths[3];
+			char* files[3];
 
-		if (lengths[1] > lengths[2]) {
-			// swap
-			int tempLength = lengths[1];
-			char* tempScript = scripts[1];
-			lengths[1] = lengths[2];
-			scripts[1] = scripts[2];
-			lengths[2] = tempLength;
-			scripts[2] = tempScript;
-		}
+			for (int i = 1; i < 4; i++)
+			{
+				int length = fileLength(scripts[i]);
+				lengths[i - 1] = length;
+				files[i - 1] = files[i];
+			}
 
-		for (int j = 0; j < 3; j++) {
-			run(scripts[j]);
+			if (lengths[0] > lengths[2]) {
+				// swap
+				int tempLength = lengths[0];
+				char* tempScript = files[0];
+				lengths[0] = lengths[2];
+				files[0] = files[2];
+				lengths[2] = tempLength;
+				files[2] = tempScript;
+			}
+
+			if (lengths[0] > lengths[1]) {
+				// swap
+				int tempLength = lengths[0];
+				char* tempScript = files[0];
+				lengths[0] = lengths[1];
+				files[0] = files[1];
+				lengths[1] = tempLength;
+				files[1] = tempScript;
+			}
+
+			if (lengths[1] > lengths[2]) {
+				// swap
+				int tempLength = lengths[1];
+				char* tempScript = files[1];
+				lengths[1] = lengths[2];
+				files[1] = files[2];
+				lengths[2] = tempLength;
+				files[2] = tempScript;
+			}
+
+			for (int j = 0; files[j]; j++) {
+				run(files[j]);
+			}
+
 		}
 
 		return 0;
