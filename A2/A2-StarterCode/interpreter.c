@@ -14,6 +14,8 @@ int badcommand();
 int badcommandTooManyTokens();
 int badcommandFileDoesNotExist();
 int fileLength(char* file);
+int duplicates(char* scripts[], int size);
+int badcommandDuplicateScripts();
 int set(char* var, char* value);
 int print(char* var);
 int run(char* script);
@@ -34,6 +36,7 @@ int interpreter(char* command_args[], int args_size){
 	for ( i=0; i<args_size; i++){ //strip spaces new line etc
 		command_args[i][strcspn(command_args[i], "\r\n")] = 0;
 	}
+
 
 	if (strcmp(command_args[0], "help")==0){
 	    //help
@@ -84,10 +87,20 @@ int interpreter(char* command_args[], int args_size){
 
 	}
 	else if(strcmp(command_args[0], "exec") == 0){
-		if(args_size < 3) return badcommand();
-		if(args_size > 5) return badcommand();
-		exec(command_args, args_size);
-	} else return badcommand();
+		if(args_size < 3) {
+			return badcommand();
+		}
+		if(args_size > 5) {
+			return badcommand();
+		}
+		if (duplicates(command_args, args_size)) {
+			return badcommandDuplicateScripts();
+		} else {
+			exec(command_args, args_size);
+		}
+	} else {
+		return badcommand();
+	}
 }
 
 int help(){
@@ -303,13 +316,80 @@ int exec(char* scripts[], int size) {
 
 		return 0;
 	}
-	else if(strcmp(scripts[size-1], "RR") == 0){
+	else if(strcmp(scripts[size-1], "RR") == 0) {
+
+
+		// open each file
+		// put each line in array
+		// run as cancer for loop??
+
+		char* allLines[10000];
+
+		int index = 0;
+
+		for (int i = 1; i < 4; i++) {
+			int errCode = 0;
+			char line[1000];
+			char address[] = "../A2_testcases_public/";
+			char* newAddress = "";
+			newAddress = strcat(address, scripts[i]);
+			// printf("%s line 336\n", scripts[i]);
+			FILE *p = fopen(newAddress,"rt");  // the program is in a file
+			size_t lineS = 0;
+			int lineCtr = 0;
+
+			if(p == NULL) {
+				return badcommandFileDoesNotExist();
+			}
+
+			fgets(line,999,p);
+			while(1) {
+
+				if(line[strlen(line)-1] != '\n'){
+					line[strlen(line)] = '\n';
+					line[strlen(line)+1] = '\0';
+				}
+
+				lineCtr += 1;
+				// printf("%s line \n", line);
+				// printf("%d index \n", index);
+				allLines[index] = strdup(line);
+
+				if(feof(p)) {
+					break;
+				}
+
+				index += 1;
+
+				fgets(line,999,p);
+			}
+		}
+
+		// printf("%d \n", index);
+		for (int j = 0; j < index; j++) {
+			printf("%s", allLines[j]);
+		}
+
 
 	}
 	else if(strcmp(scripts[size-1], "AGING") == 0){
 
 	}
-	else return  badcommand();
+	else {
+		return  badcommand();
+	}
+}
+
+int duplicates(char* scripts[], int size) {
+
+	for (int i = 0; i < size; i++) {
+		for (int j = i + 1; j < size; j++) {
+			if (!strcmp(scripts[i], scripts[j])) {
+				return 1;
+			}
+		}
+	}
+	return 0;
 }
 
 int fileLength(char* file) {
@@ -328,7 +408,6 @@ int fileLength(char* file) {
 
 	fgets(line,999,p);
 	while(1) {
-		lineS = lineS + sizeof(line);
 
 		if(line[strlen(line)-1] != '\n'){
 			line[strlen(line)] = '\n';
@@ -336,6 +415,7 @@ int fileLength(char* file) {
 		}
 
 		lineCtr += 1;
+		// printf("%s \n", line);
 		if(feof(p)) {
 			break;
 		}
@@ -343,4 +423,9 @@ int fileLength(char* file) {
 	}
 
 	return lineCtr;
+}
+
+int badcommandDuplicateScripts(){
+	printf("%s\n", "Bad command: Duplicate scripts found");
+	return 3;
 }

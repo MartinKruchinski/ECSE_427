@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> 
+#include <string.h>
 #include <stdbool.h>
 
 #include "interpreter.h"
@@ -23,18 +23,18 @@ int main(int argc, char *argv[]) {
 	//init user input
 	for (int i=0; i<MAX_USER_INPUT; i++)
 		userInput[i] = '\0';
-	
+
 	//init shell memory
 	mem_init();
 
-	while(1) {						
+	while(1) {
 		printf("%c ",prompt);
 		fgets(userInput, MAX_USER_INPUT-1, stdin);
 
 		if (feof(stdin)){
 			freopen("/dev/tty", "r", stdin);
-		}	
-		
+		}
+
 		errorCode = parseInput(userInput);
 		if (errorCode == -1) exit(99);	// ignore all other errors
 		memset(userInput, 0, sizeof(userInput));
@@ -46,12 +46,14 @@ int main(int argc, char *argv[]) {
 
 int parseInput(char ui[]) {
 	char tmp[200];
-	char *words[100];							
+	char *words[100];
 	int a = 0;
-	int b;							
-	int w=0; // wordID	
+	int b;
+	int w=0; // wordID
 	int errorCode;
-	for(a=0; ui[a]==' ' && a<1000; a++);		// skip white spaces
+	for(a=0; ui[a]==' ' && a<1000; a++){
+
+	}		// skip white spaces
 
 	while(ui[a] != '\n' && ui[a] != '\0' && a<1000) {
 		for(b=0; ui[a]!=';' && ui[a]!='\0' && ui[a]!='\n' && ui[a]!=' ' && a<1000; a++, b++)
@@ -62,7 +64,6 @@ int parseInput(char ui[]) {
 
 		if(ui[a]==';'){
 			w++;
-
 			errorCode = interpreter(words, w);
 			if(errorCode == -1){
 				return errorCode;
@@ -73,7 +74,7 @@ int parseInput(char ui[]) {
 			for(; ui[a]==' ' && a<1000; a++);		// skip white spaces
 			continue;
 		}
-		a++; 
+		a++;
 		w++;
 	}
 	errorCode = interpreter(words, w);
