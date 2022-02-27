@@ -252,6 +252,10 @@ int run(char* script) {
 		head = head->next;
 	}
 
+	for (int k = 0; k < 20; k++) {
+		printf("%d here\n", allCommands[k]);
+	}
+
 	return errCode;
 
 }
@@ -278,7 +282,7 @@ int exec(char* scripts[], int size) {
 			{
 				int length = fileLength(scripts[i]);
 				lengths[i - 1] = length;
-				files[i - 1] = scripts[i];
+				files[i - 1] = strdup(scripts[i]);
 			}
 			if (lengths[0] > lengths[1]) {
 				// swap
@@ -303,7 +307,7 @@ int exec(char* scripts[], int size) {
 			{
 				int length = fileLength(scripts[i]);
 				lengths[i - 1] = length;
-				files[i - 1] = files[i];
+				files[i - 1] = strdup(scripts[i]);
 			}
 
 			if (lengths[0] > lengths[2]) {
@@ -346,59 +350,168 @@ int exec(char* scripts[], int size) {
 	}
 	else if(strcmp(scripts[size-1], "RR") == 0) {
 
+		if (size == 3) {
+			run(scripts[1]);
+		} else if (size == 5) {
+			char* allLines[3][1000];
+			int lineCounts[3];
+			int index = 0;
 
-		// open each file
-		// put each line in array
-		// run as cancer for loop??
+			for (int i = 1; i < 4; i++) {
+				int errCode = 0;
+				char line[1000];
+				char address[] = "../A2_testcases_public/";
+				char* newAddress = "";
+				newAddress = strcat(address, scripts[i]);
+				// printf("%s line 336\n", scripts[i]);
+				FILE *p = fopen(newAddress,"rt");  // the program is in a file
+				size_t lineS = 0;
+				int lineCtr = 0;
 
-		char* allLines[10000];
-
-		int index = 0;
-
-		for (int i = 1; i < 4; i++) {
-			int errCode = 0;
-			char line[1000];
-			char address[] = "../A2_testcases_public/";
-			char* newAddress = "";
-			newAddress = strcat(address, scripts[i]);
-			// printf("%s line 336\n", scripts[i]);
-			FILE *p = fopen(newAddress,"rt");  // the program is in a file
-			size_t lineS = 0;
-			int lineCtr = 0;
-
-			if(p == NULL) {
-				return badcommandFileDoesNotExist();
-			}
-
-			fgets(line,999,p);
-			while(1) {
-
-				if(line[strlen(line)-1] != '\n'){
-					line[strlen(line)] = '\n';
-					line[strlen(line)+1] = '\0';
+				if(p == NULL) {
+					return badcommandFileDoesNotExist();
 				}
-
-				lineCtr += 1;
-				// printf("%s line \n", line);
-				// printf("%d index \n", index);
-				allLines[index] = strdup(line);
-
-				if(feof(p)) {
-					break;
-				}
-
-				index += 1;
 
 				fgets(line,999,p);
+				while(1) {
+
+					if(line[strlen(line)-1] != '\n'){
+						line[strlen(line)] = '\n';
+						line[strlen(line)+1] = '\0';
+					}
+
+					lineCtr += 1;
+					// printf("%s line \n", line);
+					// printf("%d index \n", index);
+					// printf("%d i \n", i);
+					allLines[i-1][lineCtr-1] = strdup(line);
+
+					if(feof(p)) {
+						break;
+					}
+
+					index += 1;
+
+					fgets(line,999,p);
+				}
+				lineCounts[i - 1] = lineCtr-1;
+			}
+
+			int offset = 0;
+			int prog1Done = 1;
+			int prog2Done = 1;
+			int prog3Done = 1;
+
+			// printf("%s \n", allLines[1][0]);
+
+			while ((prog1Done || prog2Done || prog3Done)) {
+
+				for (int i = 0; i < 3; i++) {
+					for (int x = 0; x < 2; x++) {
+						// printf("%s \n", allLines[0][x]);
+						// printf("%d i \n", i);
+						// printf("%d x \n", x);
+						// printf("%d x + offset \n", x + offset);
+						// printf("%d lineCounts \n", lineCounts[i]);
+
+						if (x + offset >= lineCounts[i]) {
+
+							if (i == 0) {
+								prog1Done = 0;
+							} else if (i == 1) {
+								prog2Done = 0;
+							} else if (i == 2) {
+								prog3Done = 0;
+							}
+							// printf("%d 1\n", prog1Done);
+							// printf("%d 2\n", prog2Done);
+							// printf("%d 3\n", prog3Done);
+						} else {
+							parseInput(allLines[i][x + offset]);
+						}
+					}
+				}
+				offset += 2;
+			}
+		} else {
+			char* allLines[2][1000];
+			int lineCounts[2];
+			int index = 0;
+
+			for (int i = 1; i < 3; i++) {
+				int errCode = 0;
+				char line[1000];
+				char address[] = "../A2_testcases_public/";
+				char* newAddress = "";
+				newAddress = strcat(address, scripts[i]);
+				// printf("%s line 336\n", scripts[i]);
+				FILE *p = fopen(newAddress,"rt");  // the program is in a file
+				size_t lineS = 0;
+				int lineCtr = 0;
+
+				if(p == NULL) {
+					return badcommandFileDoesNotExist();
+				}
+
+				fgets(line,999,p);
+				while(1) {
+
+					if(line[strlen(line)-1] != '\n'){
+						line[strlen(line)] = '\n';
+						line[strlen(line)+1] = '\0';
+					}
+
+					lineCtr += 1;
+					// printf("%s line \n", line);
+					// printf("%d index \n", index);
+					// printf("%d i \n", i);
+					allLines[i-1][lineCtr-1] = strdup(line);
+
+					if(feof(p)) {
+						break;
+					}
+
+					index += 1;
+
+					fgets(line,999,p);
+				}
+				lineCounts[i - 1] = lineCtr-1;
+			}
+
+			int offset = 0;
+			int prog1Done = 1;
+			int prog2Done = 1;
+
+			// printf("%s \n", allLines[1][0]);
+
+			while ((prog1Done || prog2Done )) {
+
+				for (int i = 0; i < 2; i++) {
+					for (int x = 0; x < 2; x++) {
+						// printf("%s \n", allLines[0][x]);
+						// printf("%d i \n", i);
+						// printf("%d x \n", x);
+						// printf("%d x + offset \n", x + offset);
+						// printf("%d lineCounts \n", lineCounts[i]);
+
+						if (x + offset >= lineCounts[i]) {
+
+							if (i == 0) {
+								prog1Done = 0;
+							} else if (i == 1) {
+								prog2Done = 0;
+							}
+							// printf("%d 1\n", prog1Done);
+							// printf("%d 2\n", prog2Done);
+							// printf("%d 3\n", prog3Done);
+						} else {
+							parseInput(allLines[i][x + offset]);
+						}
+					}
+				}
+				offset += 2;
 			}
 		}
-
-		// printf("%d \n", index);
-		for (int j = 0; j < index; j++) {
-			printf("%s", allLines[j]);
-		}
-
-
 	}
 	else if(strcmp(scripts[size-1], "AGING") == 0){
 

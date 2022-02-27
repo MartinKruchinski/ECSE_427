@@ -1,3 +1,0 @@
-echo HERE
-echo $NEW_VAR
-run nonExistingFile
