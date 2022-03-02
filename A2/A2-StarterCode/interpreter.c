@@ -182,7 +182,6 @@ typedef struct pcb {
 	struct pcb *next;
 } pcb_t;
 
-
 int run(char* script) {
 	int errCode = 0;
 	char line[1000];
@@ -515,6 +514,192 @@ int exec(char* scripts[], int size) {
 	}
 	else if(strcmp(scripts[size-1], "AGING") == 0){
 
+		char* allLines[3][1000];
+		int age[3];
+		int lengths[2];
+		int curCmd[3] = {0, 0, 0};
+		int index = 0;
+
+		for (int i = 1; i < 4; i++) {
+			int errCode = 0;
+			char line[1000];
+			char address[] = "../A2_testcases_public/";
+			char* newAddress = "";
+			newAddress = strcat(address, scripts[i]);
+			// printf("%s line 336\n", scripts[i]);
+			FILE *p = fopen(newAddress,"rt");  // the program is in a file
+			size_t lineS = 0;
+			int lineCtr = 0;
+
+			if(p == NULL) {
+				return badcommandFileDoesNotExist();
+			}
+
+			fgets(line,999,p);
+			while(1) {
+
+				if(line[strlen(line)-1] != '\n'){
+					line[strlen(line)] = '\n';
+					line[strlen(line)+1] = '\0';
+				}
+
+				lineCtr += 1;
+				// printf("%s line \n", line);
+				// printf("%d index \n", index);
+				// printf("%d i \n", i);
+				allLines[i-1][lineCtr-1] = strdup(line);
+
+				if(feof(p)) {
+					break;
+				}
+
+				index += 1;
+
+				fgets(line,999,p);
+			}
+			age[i - 1] = lineCtr-1;
+			lengths[i - 1] = lineCtr-1;
+		}
+
+		int progIndexes[] = {0, 1, 2};
+
+		// First sort the programs
+		if (age[0] > age[2]) {
+			// swap
+			int tempAge = age[0];
+			int tempLength = lengths[0];
+			int tempIndex = progIndexes[0];
+			age[0] = age[2];
+			progIndexes[0] = progIndexes[2];
+			lengths[0] = lengths[2];
+			age[2] = tempAge;
+			progIndexes[2] = tempIndex;
+			lengths[2]= tempLength;
+		}
+
+		if (age[0] > age[1]) {
+			// swap
+			int tempAge = age[0];
+			int tempIndex = progIndexes[0];
+			int tempLength = lengths[0];
+			age[0] = age[1];
+			progIndexes[0] = progIndexes[1];
+			lengths[0] = lengths[1];
+			age[1] = tempAge;
+			progIndexes[1] = tempIndex;
+			lengths[1] = tempLength;
+		}
+
+
+		if (age[1] > age[2]) {
+			// swap
+			int tempAge = age[1];
+			int tempIndex = progIndexes[1];
+			int tempLength = lengths[1];
+			age[1] = age[2];
+			progIndexes[1] = progIndexes[2];
+			lengths[1] = lengths[2];
+			age[2] = tempAge;
+			progIndexes[2] = tempIndex;
+			lengths[2] = tempLength;
+		}
+
+		int progDone[3] = {1, 1, 1};
+
+		// printf("%s \n", allLines[1][0]);
+		// Shortest command should be at index 0 right now
+		while ((progDone[0] || progDone[1] || progDone[2])) {
+
+			// for (int i = 0; i < 3; i++) {
+			// 	printf("%d ", progIndexes[i]);
+			// }
+
+			// printf("\n cmd\n");
+			// for (int i = 0; i < 3; i++) {
+			// 	printf("%d ", curCmd[i]);
+			// }
+
+			// printf("\n lengths\n");
+			// for (int i = 0; i < 3; i++) {
+			// 	printf("%d ", lengths[i]);
+			// }
+
+			// printf("\n age \n");
+
+			// for (int i = 0; i < 3; i++) {
+			// 	printf("%d ", age[i]);
+			// }
+			// printf("\n\n");
+
+
+			if (curCmd[0] = lengths[0]) {
+				progDone[0] = 0;
+				age[0] = 10000;
+			} else {
+				// Run first command
+				printf("%s prog\n", allLines[progIndexes[0]][curCmd[0]]);
+				parseInput(allLines[progIndexes[0]][curCmd[0]]);
+				// Increment curCmd and decrement age values
+				curCmd[0] += 1;
+
+				if (age[1] != 0) {
+					age[1] -= 1;
+				}
+
+				if (age[2] != 0) {
+					age[2] -= 1;
+				}
+			}
+			// sort programs
+			if (age[0] > age[2]) {
+				// swap
+				int tempAge = age[0];
+				int tempLength = lengths[0];
+				int tempIndex = progIndexes[0];
+				int tempDone = progDone[0];
+				age[0] = age[2];
+				progIndexes[0] = progIndexes[2];
+				lengths[0] = lengths[2];
+				progDone[0] = progDone[2];
+				age[2] = tempAge;
+				progIndexes[2] = tempIndex;
+				lengths[2]= tempLength;
+				progDone[2] = tempDone;
+			}
+
+			if (age[0] > age[1]) {
+				// swap
+				int tempAge = age[0];
+				int tempIndex = progIndexes[0];
+				int tempLength = lengths[0];
+				int tempDone = progDone[0];
+				age[0] = age[1];
+				progIndexes[0] = progIndexes[1];
+				lengths[0] = lengths[1];
+				progDone[0] = progDone[1];
+				age[1] = tempAge;
+				progIndexes[1] = tempIndex;
+				lengths[1] = tempLength;
+				progDone[1] = tempDone;
+			}
+
+			if (age[1] > age[2]) {
+				// swap
+				int tempAge = age[1];
+				int tempIndex = progIndexes[1];
+				int tempLength = lengths[1];
+				int tempDone = progDone[1];
+				age[1] = age[2];
+				progIndexes[1] = progIndexes[2];
+				lengths[1] = lengths[2];
+				progDone[1] = progDone[2];
+				age[2] = tempAge;
+				progIndexes[2] = tempIndex;
+				lengths[2] = tempLength;
+				progDone[2] = tempDone;
+			}
+
+		}
 	}
 	else {
 		return  badcommand();
