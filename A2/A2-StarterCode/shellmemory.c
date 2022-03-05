@@ -101,7 +101,6 @@ int mem_get_location(char *var_in) {
 }
 
 void mem_free_space(int start, int length){
-	// printf("%d\n", start);
 	for (int i = start; i < length; i++)
 	{
 		shellmemory[i].var = "none";
