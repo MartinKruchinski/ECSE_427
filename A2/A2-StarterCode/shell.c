@@ -31,13 +31,16 @@ int main(int argc, char *argv[]) {
 		printf("%c ",prompt);
 		fgets(userInput, MAX_USER_INPUT-1, stdin);
 
-		if (feof(stdin)){
+		if (feof(stdin)) {
 			freopen("/dev/tty", "r", stdin);
+		// }
+		// if (strlen(userInput) == 0) {
+		// 	freopen("/dev/tty", "r", stdin);
+		} else {
+			errorCode = parseInput(userInput);
+			if (errorCode == -1) exit(99);	// ignore all other errors
+			memset(userInput, 0, sizeof(userInput));
 		}
-
-		errorCode = parseInput(userInput);
-		if (errorCode == -1) exit(99);	// ignore all other errors
-		memset(userInput, 0, sizeof(userInput));
 	}
 
 	return 0;

@@ -185,7 +185,7 @@ typedef struct pcb {
 int run(char* script) {
 	int errCode = 0;
 	char line[1000];
-	char address[] = "../A2_testcases_public/";
+	char address[] = "";
 	char* newAddress = "";
 	newAddress = strcat(address, script);
 	FILE *p = fopen(newAddress,"rt");  // the program is in a file
@@ -238,7 +238,7 @@ int run(char* script) {
 	head->next = NULL;
 	int m = 0;
 	while(head != NULL){
-		for (int i = head->location.position; i < head->location.length; i++)
+		for (int i = head->location.position; i < head->location.length-1; i++)
 		{
 			m++;
 			char in = i + '0';
@@ -264,7 +264,7 @@ int exec(char* scripts[], int size) {
 			return run(scripts[1]);
 	}
 	else if(strcmp(scripts[size-1], "FCFS") == 0){
-		for (int i = 1; i < size -1; i++)
+		for (int i = 1; i < size-1; i++)
 		{
 			run(scripts[i]);
 		}
@@ -359,7 +359,7 @@ int exec(char* scripts[], int size) {
 			for (int i = 1; i < 4; i++) {
 				int errCode = 0;
 				char line[1000];
-				char address[] = "../A2_testcases_public/";
+				char address[] = "";
 				char* newAddress = "";
 				newAddress = strcat(address, scripts[i]);
 				// printf("%s line 336\n", scripts[i]);
@@ -440,7 +440,7 @@ int exec(char* scripts[], int size) {
 			for (int i = 1; i < 3; i++) {
 				int errCode = 0;
 				char line[1000];
-				char address[] = "../A2_testcases_public/";
+				char address[] = "";
 				char* newAddress = "";
 				newAddress = strcat(address, scripts[i]);
 				// printf("%s line 336\n", scripts[i]);
@@ -526,7 +526,7 @@ int exec(char* scripts[], int size) {
 			for (int i = 1; i < 4; i++) {
 				int errCode = 0;
 				char line[1000];
-				char address[] = "../A2_testcases_public/";
+				char address[] = "";
 				char* newAddress = "";
 				newAddress = strcat(address, scripts[i]);
 				// printf("%s line 336\n", scripts[i]);
@@ -796,7 +796,7 @@ int exec(char* scripts[], int size) {
 			for (int i = 1; i < 3; i++) {
 				int errCode = 0;
 				char line[1000];
-				char address[] = "../A2_testcases_public/";
+				char address[] = "";
 				char* newAddress = "";
 				newAddress = strcat(address, scripts[i]);
 				// printf("%s line 336\n", scripts[i]);
@@ -970,7 +970,7 @@ int duplicates(char* scripts[], int size) {
 int fileLength(char* file) {
 	int errCode = 0;
 	char line[1000];
-	char address[] = "../A2_testcases_public/";
+	char address[] = "";
 	char* newAddress = "";
 	newAddress = strcat(address, file);
 	FILE *p = fopen(newAddress,"rt");  // the program is in a file
