@@ -533,8 +533,8 @@ int exec(char* scripts[], int size) {
 
 					fgets(line,999,p);
 				}
-				jobLength[i - 1] = lineCtr-1;
-				lengths[i - 1] = lineCtr-1;
+				jobLength[i - 1] = lineCtr;
+				lengths[i - 1] = lineCtr;
 			}
 
 			int readyQueue[] = {0, 1, 2};
@@ -593,6 +593,17 @@ int exec(char* scripts[], int size) {
 
 			// // Shortest command should be at index 0 right now
 			while ((progDone[0] || progDone[1] || progDone[2])) {
+
+				// printf("\n age\n");
+				// for (int i = 0; i < 3; i++){
+				// 	printf("%d ", jobLength[i]);
+				// }
+
+				// printf("\n index\n");
+				// for (int i = 0; i < 3; i++){
+				// 	printf("%d ", readyQueue[i]);
+				// }
+				// printf("\n");
 
 				if (curCmd[0] == lengths[0]) {
 					progDone[0] = 0;
