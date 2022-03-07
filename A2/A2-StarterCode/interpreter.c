@@ -253,6 +253,7 @@ int exec(char* scripts[], int size) {
 			return run(scripts[1]);
 	}
 	else if(strcmp(scripts[size-1], "FCFS") == 0){
+		printf("here");
 		for (int i = 1; i < size-1; i++)
 		{
 			run(scripts[i]);
