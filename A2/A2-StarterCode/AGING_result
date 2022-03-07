@@ -5,7 +5,7 @@ COMMAND                 DESCRIPTION
  set VAR STRING         Assigns a value to shell memory
  print VAR              Displays the STRING assigned to VAR
  run SCRIPT.TXT         Executes the file SCRIPT.TXT
-
+ 
 $ exec prog1 prog2 prog3 AGING
 P1L1
 OOOOP3L1OOOO
@@ -26,4 +26,4 @@ OOP2L4OO
 OOP2L5OO
 OOP2L6OO
 OOP2L7OO
-$
+$ 

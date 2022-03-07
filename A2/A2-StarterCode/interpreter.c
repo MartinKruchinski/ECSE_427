@@ -231,7 +231,7 @@ int run(char* script) {
 	head->next = NULL;
 	int m = 0;
 	while(head != NULL){
-		for (int i = head->location.position; i < head->location.length-1; i++)
+		for (int i = head->location.position; i < head->location.length; i++)
 		{
 			m++;
 			char in = i + '0';
@@ -253,7 +253,6 @@ int exec(char* scripts[], int size) {
 			return run(scripts[1]);
 	}
 	else if(strcmp(scripts[size-1], "FCFS") == 0){
-		printf("here");
 		for (int i = 1; i < size-1; i++)
 		{
 			run(scripts[i]);
@@ -379,7 +378,7 @@ int exec(char* scripts[], int size) {
 
 					fgets(line,999,p);
 				}
-				lineCounts[i - 1] = lineCtr-1;
+				lineCounts[i - 1] = lineCtr;
 			}
 
 			int offset = 0;
@@ -893,6 +892,6 @@ int fileLength(char* file) {
 }
 
 int badcommandDuplicateScripts(){
-	printf("%s\n", "Bad command: Duplicate scripts found");
+	printf("%s\n", "Bad command: same file name");
 	return 3;
 }
