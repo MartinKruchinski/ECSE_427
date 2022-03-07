@@ -33,11 +33,11 @@ int main(int argc, char *argv[]) {
 
 		if (feof(stdin)) {
 			freopen("/dev/tty", "r", stdin);
-		} else {
+		} 
 			errorCode = parseInput(userInput);
 			if (errorCode == -1) exit(99);	// ignore all other errors
 			memset(userInput, 0, sizeof(userInput));
-		}
+		
 	}
 
 	return 0;
