@@ -5,6 +5,8 @@
 #include "shellmemory.h"
 #include "shell.h"
 
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+
 int MAX_ARGS_SIZE = 7;
 int UNIQUE_PID = 0;
 
@@ -27,7 +29,7 @@ int interpreter(char* command_args[], int args_size){
 	int i;
 	// if(args_size > 2 && strcmp(command_args[0], "set") != 0){
 	// 	printf("size of args: %d %s %s %s\n", args_size, command_args[0], command_args[1], command_args[2]);
-		
+
 	// }
 	// if(args_size > 2 && strcmp(command_args[0], "set") != 0){
 	// 	printf("argsize: %d %s\n", args_size, command_args[2]);
@@ -206,14 +208,14 @@ int run(char* script) {
 			line[strlen(line)] = '\0';
 			line[strlen(line)+1] = '\n';
 		}
-		
+
 		char string = lineCtr + '0';
 		char lineString[2] = "";
-		
+
 		strncat(lineString ,&string, 1);
 		set(lineString,line);
 		lineCtr += 1;
-		
+
 		if(feof(p)) {
 			break;
 		}
@@ -269,80 +271,6 @@ int exec(char* scripts[], int size) {
 		return 0;
 	}
 	else if(strcmp(scripts[size-1], "SJF") == 0){
-
-		if (size == 4) {
-			// Need to sort jobs
-			int lengths[2];
-			char* files[2];
-
-			for (int i = 1; i < 3; i++)
-			{
-				int length = fileLength(scripts[i]);
-				lengths[i - 1] = length;
-				files[i - 1] = strdup(scripts[i]);
-			}
-			if (lengths[0] > lengths[1]) {
-				// swap
-				int tempLength = lengths[0];
-				char* tempScript = files[0];
-				lengths[0] = lengths[1];
-				files[0] = files[1];
-				lengths[1] = tempLength;
-				files[1] = tempScript;
-			}
-
-			for (int j = 0; files[j]; j++) {
-				run(files[j]);
-			}
-		} else {
-
-			// Need to sort jobs
-			int lengths[3];
-			char* files[3];
-
-			for (int i = 1; i < 4; i++)
-			{
-				int length = fileLength(scripts[i]);
-				lengths[i - 1] = length;
-				files[i - 1] = strdup(scripts[i]);
-			}
-
-			if (lengths[0] > lengths[2]) {
-				// swap
-				int tempLength = lengths[0];
-				char* tempScript = files[0];
-				lengths[0] = lengths[2];
-				files[0] = files[2];
-				lengths[2] = tempLength;
-				files[2] = tempScript;
-			}
-
-			if (lengths[0] > lengths[1]) {
-				// swap
-				int tempLength = lengths[0];
-				char* tempScript = files[0];
-				lengths[0] = lengths[1];
-				files[0] = files[1];
-				lengths[1] = tempLength;
-				files[1] = tempScript;
-			}
-
-			if (lengths[1] > lengths[2]) {
-				// swap
-				int tempLength = lengths[1];
-				char* tempScript = files[1];
-				lengths[1] = lengths[2];
-				files[1] = files[2];
-				lengths[2] = tempLength;
-				files[2] = tempScript;
-			}
-
-			for (int j = 0; files[j]; j++) {
-				run(files[j]);
-			}
-
-		}
-
 		return 0;
 	}
 	else if(strcmp(scripts[size-1], "RR") == 0) {
@@ -350,6 +278,7 @@ int exec(char* scripts[], int size) {
 		if (size == 3) {
 			run(scripts[1]);
 		} else if (size == 5) {
+			// load lines
 			char* allLines[3][1000];
 			int lineCounts[3];
 			int index = 0;
@@ -372,7 +301,9 @@ int exec(char* scripts[], int size) {
 				while(1) {
 
 					if(line[strlen(line)-1] != '\n'){
-						line[strlen(line)] = '\n';
+						// printf("HERERERER");
+						// printf("%s \n", line);
+						// line[strlen(line)] = '\n';
 						line[strlen(line)+1] = '\0';
 					}
 
@@ -389,18 +320,85 @@ int exec(char* scripts[], int size) {
 				}
 				lineCounts[i - 1] = lineCtr;
 			}
+			// files loaded into allLines
+
+			// load into directoryStore
+			char* directoryStore[1000];
+
+			for (int i = 0; i < 1000; i++) {
+				directoryStore[i] = "none";
+			}
 
 			int offset = 0;
+			int curProg = 0;
+			// int i = 0;
+			int maxLines = MAX(lineCounts[0], MAX(lineCounts[2], lineCounts[1]));
+			int sum = lineCounts[0] + lineCounts[1] + lineCounts[2];
+
+			// printf("%d sum \n", sum);
+
+			for (int i = 0; i < sum/2 + 1; i++) {
+				if (offset < maxLines) {
+					while (offset >= lineCounts[curProg]) {
+						curProg = (curProg + 1) % 3;
+					}
+				}
+				for (int j = 0 ; j < 3; j++ ) {
+					if (j + offset < lineCounts[curProg]) {
+						directoryStore[i * 3 + j] = allLines[curProg][j + offset];
+					}
+				}
+				if (curProg + 1 == 3) {
+					offset += 3;
+				}
+				curProg = (curProg + 1) % 3;
+			}
+
+			// for (int i = 0; i < 50; i++) {
+			// 	printf("%s \n", directoryStore[i]);
+			// }
+
+			// loaded into frame
+
+			// for (int i = 0; i < 6; i++) {
+			// 	for (int j = 0; j < 2; j++) {
+			// 		printf("%s \n", frameStore[3 * i + j]);
+			// 	}
+			// }
+
+			// return 0;
+
+			offset = 0;
+
+			int frameIndex = 0;
+			char* backingStore[1000];
+
+			for (int i = 0; i < 1000; i++) {
+				backingStore[i] = "none";
+			}
+
 			int prog1Done = 1;
 			int prog2Done = 1;
 			int prog3Done = 1;
 
+			int curSetting;
 
+			//load into backing store as RR
 			while ((prog1Done || prog2Done || prog3Done)) {
 
 				for (int i = 0; i < 3; i++) {
 					for (int x = 0; x < 2; x++) {
-						if (x + offset >= lineCounts[i]) {
+						// printf("%d lineCont \n", lineCounts[i]);
+						// printf("%d i\n", i);
+
+						if (i == 0 && prog1Done == 0) {
+
+						} else if (i == 1 && prog2Done == 0) {
+
+						} else if (i == 2 && prog3Done == 0) {
+
+						}
+						else if (x + offset >= lineCounts[i]) {
 
 							if (i == 0) {
 								prog1Done = 0;
@@ -410,12 +408,137 @@ int exec(char* scripts[], int size) {
 								prog3Done = 0;
 							}
 						} else {
-							parseInput(allLines[i][x + offset]);
+							// printf("%d \n", x);
+							// printf("%s \n", allLines[i][x + offset]);
+							backingStore[frameIndex] = strdup(allLines[i][x + offset]);
+							// parseInput(allLines[i][x + offset]);
 						}
+					frameIndex++;
+
 					}
 				}
 				offset += 2;
 			}
+
+			// for (int i = 0; i < 50; i++) {
+			// 	printf("%s \n", backingStore[i]);
+			// }
+
+			// load into frame store
+
+			char* frameStore[18];
+
+			for (int i = 0; i < 18; i++) {
+				frameStore[i] = strdup(directoryStore[i]);
+			}
+
+			// for (int i = 0; i < 18; i++) {
+			// 	printf("%s \n", frameStore[i]);
+			// }
+			// return 0;
+			// loaded into frameStore
+
+			// Start runnin commands
+
+			frameIndex = 0;
+			int directoryIndex = 18;
+			int i = 0;
+			while (i < 500) {
+				// printf("%d \n", i);
+				// search frameStore for command
+				if (strcmp(backingStore[i], "none") != 0) {
+					int found = 0;
+					for (int j = 0; j < 18; j++) {
+						if (strcmp(frameStore[j], backingStore[i]) == 0) {
+							found = 1;
+						}
+					}
+
+					if (found) {
+						printf("FOUND | ");
+						printf("%s \n", backingStore[i]);
+					} else {
+						// PAGE FAULT HERE
+						// for (int i = 0; i < 18; i++) {
+						printf("Page fault! Victim Contents:\n");
+
+						char* temp = strdup(frameStore[frameIndex]);
+						// printf("%s", frameStore[frameIndex]);
+						printf("%s", temp);
+
+						temp = strdup(frameStore[ frameIndex + 1]);
+						// printf("%s", frameStore[frameIndex + 1]);
+						printf("%s", temp);
+
+						temp = frameStore[frameIndex + 2];
+						// printf("%s", frameStore[frameIndex + 2]);
+						printf("%s", temp);
+
+						printf("End of victim page contents.\n");
+
+						// replace frameStore with directory store
+						// printf("fes");
+						// printf("%d \n", frameIndex);
+						// printf("%d \n", directoryIndex);
+
+						temp = strdup(directoryStore[directoryIndex]);
+						frameStore[frameIndex] = temp;
+						// // frameStore[frameIndex] = strdup(directoryStore[directoryIndex]);
+
+						temp = strdup(directoryStore[directoryIndex + 1]);
+						frameStore[frameIndex + 1] = temp;
+						// // frameStore[frameIndex + 1] = strdup(directoryStore[directoryIndex + 1]);
+
+						temp = strdup(directoryStore[directoryIndex + 2]);
+						frameStore[frameIndex] = temp;
+						// frameStore[frameIndex + 2] = strdup(directoryStore[directoryIndex + 2]);
+						// return 0;
+
+						frameIndex = (frameIndex + 3) % 18;
+						directoryIndex += 3;
+
+						// // move commands around in the backingStore
+						// // even num means its the first command of 2
+						if (i % 2 == 0){
+							char* temp = strdup(backingStore[i]);
+							char* temp2 = strdup(backingStore[i + 1]);
+							backingStore[i] = backingStore[i + 2];
+							backingStore[i + 1] = backingStore[i + 3];
+
+							backingStore[i + 2] = backingStore[i + 4];
+							backingStore[i + 3] = backingStore[i + 5];
+
+							backingStore[i + 4] = temp;
+							backingStore[i + 5] = temp2;
+						} else { // odd means that the second command in RR failed, need to do extra
+							// char* temp = strdup(backingStore[i]);
+							char* temp = strdup(backingStore[i]);
+							backingStore[i - 1] = backingStore[i + 1];
+							backingStore[i] = backingStore[i + 2];
+
+							backingStore[i + 1] = backingStore[i + 3];
+							backingStore[i + 2] = backingStore[i + 4];
+
+							backingStore[i + 3] = NULL;
+							backingStore[i + 4] = temp;
+						}
+
+						printf("%s \n", frameStore[0]);
+						printf("%s \n", frameStore[1]);
+						printf("%s \n", frameStore[2]);
+
+
+						return 0;
+						i--;
+						// printf("%s\n \n", backingStore[i]);
+						// break;
+					}
+				}
+				i++;
+			}
+
+			return 0;
+
 		} else {
 			char* allLines[2][1000];
 			int lineCounts[2];
@@ -483,347 +606,10 @@ int exec(char* scripts[], int size) {
 		}
 	}
 	else if(strcmp(scripts[size-1], "AGING") == 0){
-
-		if (size == 3) {
-			run(scripts[1]);
-		} else if (size == 5) {
-			char* allLines[3][1000];
-			int jobLength[3];
-			int lengths[3];
-			int curCmd[3] = {0, 0, 0};
-			int index = 0;
-
-			for (int i = 1; i < 4; i++) {
-				int errCode = 0;
-				char line[1000];
-				char address[] = "";
-				char* newAddress = "";
-				newAddress = strcat(address, scripts[i]);
-				FILE *p = fopen(newAddress,"rt");  // the program is in a file
-				size_t lineS = 0;
-				int lineCtr = 0;
-
-				if(p == NULL) {
-					return badcommandFileDoesNotExist();
-				}
-
-				fgets(line,999,p);
-				while(1) {
-
-					// if(line[strlen(line)-1] != '\n'){
-					// 	line[strlen(line)] = '\n';
-					// 	line[strlen(line)+1] = '\0';
-					// }
-
-					lineCtr += 1;
-					allLines[i-1][lineCtr-1] = strdup(line);
-
-					if(feof(p)) {
-						break;
-					}
-
-					index += 1;
-
-					fgets(line,999,p);
-				}
-				jobLength[i - 1] = lineCtr;
-				lengths[i - 1] = lineCtr;
-			}
-
-			int readyQueue[] = {0, 1, 2};
-
-			// Sort commands
-
-			if (jobLength[0] > jobLength[2]) {
-				// Swap
-				int tempScore = jobLength[2];
-				int tempLength = lengths[2];
-				int tempIndex = readyQueue[2];
-				int tempCurCmd = curCmd[2];
-				jobLength[2] = jobLength[0];
-				lengths[2] = lengths[0];
-				readyQueue[2] = readyQueue[0];
-				curCmd[2] = curCmd[0];
-				jobLength[0] = tempScore;
-				lengths[0] = tempLength;
-				readyQueue[0] = tempIndex;
-				curCmd[0] = tempCurCmd;
-			}
-
-			if (jobLength[0] > jobLength[1]) {
-				// Swap
-				int tempScore = jobLength[1];
-				int tempLength = lengths[1];
-				int tempIndex = readyQueue[1];
-				int tempCurCmd = curCmd[1];
-				jobLength[1] = jobLength[0];
-				lengths[1] = lengths[0];
-				readyQueue[1] = readyQueue[0];
-				curCmd[1] = curCmd[0];
-				jobLength[0] = tempScore;
-				lengths[0] = tempLength;
-				readyQueue[0] = tempIndex;
-				curCmd[0] = tempCurCmd;
-			}
-
-			if (jobLength[1] > jobLength[2]) {
-				// Swap
-				int tempScore = jobLength[1];
-				int tempLength = lengths[1];
-				int tempIndex = readyQueue[1];
-				int tempCurCmd = curCmd[1];
-				jobLength[1] = jobLength[2];
-				lengths[1] = lengths[2];
-				readyQueue[1] = readyQueue[2];
-				curCmd[1] = curCmd[2];
-				jobLength[2] = tempScore;
-				lengths[2] = tempLength;
-				readyQueue[2] = tempIndex;
-				curCmd[2] = tempCurCmd;
-			}
-
-			int progDone[3] = {1, 1, 1};
-
-			// // Shortest command should be at index 0 right now
-			while ((progDone[0] || progDone[1] || progDone[2])) {
-
-
-				if (curCmd[0] == lengths[0]) {
-					progDone[0] = 0;
-					jobLength[0] = 10000;
-				} else {
-					// Run first command
-					parseInput(allLines[readyQueue[0]][curCmd[0]]);
-					// Increment curCmd and decrement jobLength values
-					curCmd[0] += 1;
-					if (curCmd[0] == lengths[0]) {
-						progDone[0] = 0;
-						jobLength[0] = 10000;
-					}
-					if (jobLength[1] != 0) {
-						jobLength[1] -= 1;
-					}
-
-					if (jobLength[2] != 0) {
-						jobLength[2] -= 1;
-					}
-				}
-
-				// sort programs
-				if (jobLength[0] > jobLength[1]) {
-					// swap 0 and 1
-					int tempScore = jobLength[0];
-					int tempIndex = readyQueue[0];
-					int tempLength = lengths[0];
-					int tempCur = curCmd[0];
-					int tempDone = progDone[0];
-					jobLength[0] = jobLength[1];
-					curCmd[0] = curCmd[1];
-					readyQueue[0] = readyQueue[1];
-					lengths[0] = lengths[1];
-					progDone[0] = progDone[1];
-					jobLength[1] = tempScore;
-					curCmd[1] = tempCur;
-					readyQueue[1] = tempIndex;
-					lengths[1] = tempLength;
-					progDone[1] = tempDone;
-
-					if (jobLength[1] >= jobLength[2]) {
-						// swap
-						int tempScore = jobLength[1];
-						int tempIndex = readyQueue[1];
-						int tempCur = curCmd[1];
-						int tempLength = lengths[1];
-						int tempDone = progDone[1];
-						jobLength[1] = jobLength[2];
-						curCmd[1] = curCmd[2];
-						readyQueue[1] = readyQueue[2];
-						lengths[1] = lengths[2];
-						progDone[1] = progDone[2];
-						jobLength[2] = tempScore;
-						curCmd[2] = tempCur;
-						readyQueue[2] = tempIndex;
-						lengths[2] = tempLength;
-						progDone[2] = tempDone;
-					}
-
-				}
-
-				if (jobLength[0] > jobLength[1]) {
-					// swap
-					int tempScore = jobLength[0];
-					int tempIndex = readyQueue[0];
-					int tempLength = lengths[0];
-					int tempCur = curCmd[0];
-					int tempDone = progDone[0];
-					jobLength[0] = jobLength[1];
-					curCmd[0] = curCmd[1];
-					readyQueue[0] = readyQueue[1];
-					lengths[0] = lengths[1];
-					progDone[0] = progDone[1];
-					jobLength[1] = tempScore;
-					curCmd[1] = tempCur;
-					readyQueue[1] = tempIndex;
-					lengths[1] = tempLength;
-					progDone[1] = tempDone;
-				}
-
-				if (jobLength[0] > jobLength[2]) {
-					// swap
-					int tempScore = jobLength[0];
-					int tempLength = lengths[0];
-					int tempIndex = readyQueue[0];
-					int tempCur = curCmd[0];
-					int tempDone = progDone[0];
-					jobLength[0] = jobLength[2];
-					readyQueue[0] = readyQueue[2];
-					curCmd[0] = curCmd[2];
-					lengths[0] = lengths[2];
-					progDone[0] = progDone[2];
-					jobLength[2] = tempScore;
-					readyQueue[2] = tempIndex;
-					curCmd[2] = tempCur;
-					lengths[2]= tempLength;
-					progDone[2] = tempDone;
-				}
-
-
-				if (jobLength[1] > jobLength[2]) {
-					// swap
-					int tempScore = jobLength[1];
-					int tempIndex = readyQueue[1];
-					int tempCur = curCmd[1];
-					int tempLength = lengths[1];
-					int tempDone = progDone[1];
-					jobLength[1] = jobLength[2];
-					curCmd[1] = curCmd[2];
-					readyQueue[1] = readyQueue[2];
-					lengths[1] = lengths[2];
-					progDone[1] = progDone[2];
-					jobLength[2] = tempScore;
-					curCmd[2] = tempCur;
-					readyQueue[2] = tempIndex;
-					lengths[2] = tempLength;
-					progDone[2] = tempDone;
-				}
-
-			}
-		} else {
-
-			char* allLines[2][1000];
-			int jobLength[2];
-			int lengths[2];
-			int curCmd[2] = {0, 0};
-			int index = 0;
-
-			for (int i = 1; i < 3; i++) {
-				int errCode = 0;
-				char line[1000];
-				char address[] = "";
-				char* newAddress = "";
-				newAddress = strcat(address, scripts[i]);
-				FILE *p = fopen(newAddress,"rt");  // the program is in a file
-				size_t lineS = 0;
-				int lineCtr = 0;
-
-				if(p == NULL) {
-					return badcommandFileDoesNotExist();
-				}
-
-				fgets(line,999,p);
-				while(1) {
-
-					if(line[strlen(line)-1] != '\n'){
-						line[strlen(line)] = '\n';
-						line[strlen(line)+1] = '\0';
-					}
-
-					lineCtr += 1;
-					allLines[i-1][lineCtr-1] = strdup(line);
-
-					if(feof(p)) {
-						break;
-					}
-
-					index += 1;
-
-					fgets(line,999,p);
-				}
-				jobLength[i - 1] = lineCtr;
-				lengths[i - 1] = lineCtr;
-			}
-
-			int readyQueue[] = {0, 1};
-
-			// Sort commands
-
-			if (jobLength[0] > jobLength[1]) {
-				// Swap
-				int tempScore = jobLength[1];
-				int tempLength = lengths[1];
-				int tempIndex = readyQueue[1];
-				int tempCurCmd = curCmd[1];
-				jobLength[1] = jobLength[0];
-				lengths[1] = lengths[0];
-				readyQueue[1] = readyQueue[0];
-				curCmd[1] = curCmd[0];
-				jobLength[0] = tempScore;
-				lengths[0] = tempLength;
-				readyQueue[0] = tempIndex;
-				curCmd[0] = tempCurCmd;
-			}
-
-			int progDone[3] = {1, 1};
-
-			// // Shortest command should be at index 0 right now
-			while (progDone[0] || progDone[1]) {
-
-				if (curCmd[0] == lengths[0]) {
-					progDone[0] = 0;
-					jobLength[0] = 10000;
-				} else {
-					// Run first command
-					parseInput(allLines[readyQueue[0]][curCmd[0]]);
-					// Increment curCmd and decrement jobLength values
-					curCmd[0] += 1;
-					if (curCmd[0] == lengths[0]) {
-						progDone[0] = 0;
-						jobLength[0] = 10000;
-					}
-					if (jobLength[1] != 0) {
-						jobLength[1] -= 1;
-					}
-
-					if (jobLength[2] != 0) {
-						jobLength[2] -= 1;
-					}
-				}
-
-				if (jobLength[0] > jobLength[1]) {
-					// swap 0 and 1
-					int tempScore = jobLength[0];
-					int tempIndex = readyQueue[0];
-					int tempLength = lengths[0];
-					int tempCur = curCmd[0];
-					int tempDone = progDone[0];
-					jobLength[0] = jobLength[1];
-					curCmd[0] = curCmd[1];
-					readyQueue[0] = readyQueue[1];
-					lengths[0] = lengths[1];
-					progDone[0] = progDone[1];
-					jobLength[1] = tempScore;
-					curCmd[1] = tempCur;
-					readyQueue[1] = tempIndex;
-					lengths[1] = tempLength;
-					progDone[1] = tempDone;
-
-				}
-
-			}
-		}
+		return 0;
 	}
 	else {
-		return  badcommand();
+		return badcommand();
 	}
 }
 
