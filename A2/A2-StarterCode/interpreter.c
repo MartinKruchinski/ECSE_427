@@ -455,8 +455,9 @@ int exec(char* scripts[], int size) {
 					}
 
 					if (found) {
-						printf("FOUND | ");
-						printf("%s \n", backingStore[i]);
+						// printf("FOUND | ");
+						// printf("%s \n", backingStore[i]);
+						parseInput(backingStore[i]);
 					} else {
 						// PAGE FAULT HERE
 						// for (int i = 0; i < 18; i++) {
@@ -490,7 +491,7 @@ int exec(char* scripts[], int size) {
 						// // frameStore[frameIndex + 1] = strdup(directoryStore[directoryIndex + 1]);
 
 						temp = strdup(directoryStore[directoryIndex + 2]);
-						frameStore[frameIndex] = temp;
+						frameStore[frameIndex + 2] = temp;
 						// frameStore[frameIndex + 2] = strdup(directoryStore[directoryIndex + 2]);
 						// return 0;
 
@@ -519,16 +520,20 @@ int exec(char* scripts[], int size) {
 							backingStore[i + 1] = backingStore[i + 3];
 							backingStore[i + 2] = backingStore[i + 4];
 
-							backingStore[i + 3] = NULL;
+							backingStore[i + 3] = "none";
 							backingStore[i + 4] = temp;
 						}
 
-						printf("%s \n", frameStore[0]);
-						printf("%s \n", frameStore[1]);
-						printf("%s \n", frameStore[2]);
+						// printf("%s \n", directoryStore[18]);
+						// printf("%s \n", directoryStore[19]);
+						// printf("%s \n", directoryStore[20]);
+
+						// printf("%s \n", frameStore[0]);
+						// printf("%s \n", frameStore[1]);
+						// printf("%s \n", frameStore[2]);
 
 
-						return 0;
+						// return 0;
 						i--;
 						// printf("%s\n \n", backingStore[i]);
 						// break;
