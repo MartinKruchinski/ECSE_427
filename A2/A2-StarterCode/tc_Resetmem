@@ -1,0 +1,8 @@
+echo resetMemTest
+set saba TestingTesting
+print saba
+resetmem
+echo ERASED
+set erased saba should be erased
+print erased
+print saba
