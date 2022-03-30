@@ -10,11 +10,14 @@
 
 int MAX_USER_INPUT = 1000;
 int parseInput(char ui[]);
+int framesize = FRAMESIZE;
+int varsize = VARSIZE;
 
 int main(int argc, char *argv[]) {
 
 	printf("%s\n", "Shell version 1.1 Created January 2022");
 	help();
+	printf("Frame Store size = %d; Variable Store size = %d\n", framesize, varsize);
 
 	char prompt = '$';  				// Shell prompt
 	char userInput[MAX_USER_INPUT];		// user's input stored here
@@ -33,11 +36,11 @@ int main(int argc, char *argv[]) {
 
 		if (feof(stdin)) {
 			freopen("/dev/tty", "r", stdin);
-		} 
+		}
 			errorCode = parseInput(userInput);
 			if (errorCode == -1) exit(99);	// ignore all other errors
 			memset(userInput, 0, sizeof(userInput));
-		
+
 	}
 
 	return 0;

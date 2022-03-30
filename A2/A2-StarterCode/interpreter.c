@@ -7,6 +7,10 @@
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
+#ifndef VARSIZE
+#define FRAMESIZE
+#endif
+
 int MAX_ARGS_SIZE = 7;
 int UNIQUE_PID = 0;
 
@@ -260,6 +264,7 @@ int run(char* script) {
 }
 
 int exec(char* scripts[], int size) {
+	// printf("%d \n", FRAMESIZE);
 	if(size == 3){
 			return run(scripts[1]);
 	}
@@ -383,7 +388,7 @@ int exec(char* scripts[], int size) {
 
 			int curSetting;
 
-			//load into backing store as RR
+			// load into backing store as RR
 			while ((prog1Done || prog2Done || prog3Done)) {
 
 				for (int i = 0; i < 3; i++) {
@@ -426,29 +431,37 @@ int exec(char* scripts[], int size) {
 
 			// load into frame store
 
-			char* frameStore[18];
+			char* frameStore[FRAMESIZE];
 
-			for (int i = 0; i < 18; i++) {
+			for (int i = 0; i < FRAMESIZE; i++) {
 				frameStore[i] = strdup(directoryStore[i]);
 			}
 
-			// for (int i = 0; i < 18; i++) {
-			// 	printf("%s \n", frameStore[i]);
+			// for (int i = 0; i < 50; i++) {
+			// 	printf("%s \n", directoryStore[i]);
 			// }
 			// return 0;
 			// loaded into frameStore
 
 			// Start runnin commands
 
+			for (int i = 0; i < 30; i++) {
+				printf("%d %s \n", i, backingStore[i]);
+			}
+
+			return 0;
+
 			frameIndex = 0;
-			int directoryIndex = 18;
+			int directoryIndex = FRAMESIZE;
 			int i = 0;
 			while (i < 500) {
 				// printf("%d \n", i);
 				// search frameStore for command
+				// printf("%d i index \n", i);
 				if (strcmp(backingStore[i], "none") != 0) {
+					// printf("%s backingStore command at i=%d \n", backingStore[i], i);
 					int found = 0;
-					for (int j = 0; j < 18; j++) {
+					for (int j = 0; j < FRAMESIZE; j++) {
 						if (strcmp(frameStore[j], backingStore[i]) == 0) {
 							found = 1;
 						}
@@ -461,13 +474,15 @@ int exec(char* scripts[], int size) {
 					} else {
 						// PAGE FAULT HERE
 						// for (int i = 0; i < 18; i++) {
+						// printf("%s failed command\n", backingStore[i]);
+						// printf("%d i index \n", i);
 						printf("Page fault! Victim Contents:\n");
 
 						char* temp = strdup(frameStore[frameIndex]);
 						// printf("%s", frameStore[frameIndex]);
 						printf("%s", temp);
 
-						temp = strdup(frameStore[ frameIndex + 1]);
+						temp = strdup(frameStore[frameIndex + 1]);
 						// printf("%s", frameStore[frameIndex + 1]);
 						printf("%s", temp);
 
@@ -481,7 +496,11 @@ int exec(char* scripts[], int size) {
 						// printf("fes");
 						// printf("%d \n", frameIndex);
 						// printf("%d \n", directoryIndex);
+						// printf("%d dirIndex\n", directoryIndex);
+						// printf("%s dir command\n", directoryStore[directoryIndex]);
 
+						// printf("%d frameIndex\n", frameIndex);
+						// printf("%s frame command\n", frameStore[frameIndex]);
 						temp = strdup(directoryStore[directoryIndex]);
 						frameStore[frameIndex] = temp;
 						// // frameStore[frameIndex] = strdup(directoryStore[directoryIndex]);
@@ -495,14 +514,20 @@ int exec(char* scripts[], int size) {
 						// frameStore[frameIndex + 2] = strdup(directoryStore[directoryIndex + 2]);
 						// return 0;
 
-						frameIndex = (frameIndex + 3) % 18;
+						frameIndex = (frameIndex + 3) % FRAMESIZE;
 						directoryIndex += 3;
 
 						// // move commands around in the backingStore
 						// // even num means its the first command of 2
 						if (i % 2 == 0){
+							// printf("here\n");
 							char* temp = strdup(backingStore[i]);
 							char* temp2 = strdup(backingStore[i + 1]);
+
+							// printf("%s temp\n", temp);
+							// printf("%s temp2\n", temp2);
+							// printf("%s backingStore[i+2]\n", backingStore[i+2]);
+
 							backingStore[i] = backingStore[i + 2];
 							backingStore[i + 1] = backingStore[i + 3];
 
@@ -511,6 +536,14 @@ int exec(char* scripts[], int size) {
 
 							backingStore[i + 4] = temp;
 							backingStore[i + 5] = temp2;
+
+							// printf("%s backingStore[i]\n", backingStore[i]);
+							// printf("%s backingStore[i+1]\n", backingStore[i+1]);
+							// printf("%s backingStore[i+2]\n", backingStore[i+2]);
+							// printf("%s backingStore[i+3]\n", backingStore[i+3]);
+							// printf("%s backingStore[i+4]\n", backingStore[i+4]);
+
+							i--;
 						} else { // odd means that the second command in RR failed, need to do extra
 							// char* temp = strdup(backingStore[i]);
 							char* temp = strdup(backingStore[i]);
@@ -522,6 +555,8 @@ int exec(char* scripts[], int size) {
 
 							backingStore[i + 3] = "none";
 							backingStore[i + 4] = temp;
+							i--;
+							i--;
 						}
 
 						// printf("%s \n", directoryStore[18]);
@@ -534,7 +569,7 @@ int exec(char* scripts[], int size) {
 
 
 						// return 0;
-						i--;
+						// i--;
 						// printf("%s\n \n", backingStore[i]);
 						// break;
 					}
