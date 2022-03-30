@@ -32,6 +32,7 @@ int exec(char* scripts[], int size);
 
 int interpreter(char* command_args[], int args_size){
 	int i;
+
 	// if(args_size > 2 && strcmp(command_args[0], "set") != 0){
 	// 	printf("size of args: %d %s %s %s\n", args_size, command_args[0], command_args[1], command_args[2]);
 
@@ -89,7 +90,9 @@ int interpreter(char* command_args[], int args_size){
 
 	}else if (strcmp(command_args[0], "echo")==0) {
 
-		if (args_size > 3) return badcommand();
+		if (args_size > 3) {
+			return badcommand();
+		}
 		return echo(command_args[1]);
 
 	}
@@ -103,10 +106,10 @@ int interpreter(char* command_args[], int args_size){
 		// if (duplicates(command_args, args_size)) {
 		// 	return badcommandDuplicateScripts();
 		// }
-		 else {
+		else {
 			exec(command_args, args_size);
 		}
-	} if (strcmp(command_args[0], "resetmem")==0){
+	} else if (strcmp(command_args[0], "resetmem")==0){
 	    //help
 	    if (args_size != 1) return badcommand();
 		printf("Memory was Reset\n");
@@ -199,7 +202,7 @@ typedef struct pcb {
 } pcb_t;
 
 int run(char* script) {
-	printf("here");
+	// printf("here");
 	// load lines
 	char* allLines[1][1000];
 	int lineCounts[1];
@@ -381,7 +384,7 @@ int run(char* script) {
 
 			if (found) {
 				// printf("FOUND | ");
-				// printf("%s \n", backingStore[i]);
+				// printf("%s here\n", backingStore[i]);
 				parseInput(backingStore[i]);
 			} else {
 				// PAGE FAULT HERE
@@ -492,81 +495,6 @@ int run(char* script) {
 	return 0;
 }
 
-int run2(char* script) {
-	int errCode = 0;
-	char line[1000];
-	char address[] = "";
-	char* newAddress = "";
-	newAddress = strcat(address, script);
-	FILE *p = fopen(newAddress,"rt");  // the program is in a file
-	size_t lineS = 0;
-	int lineCtr = 0;
-	int stringlength = 0;
-
-	char allCommands[10000]; //Holds all the commands in the file separated by a ;
-
-	if(p == NULL) {
-		return badcommandFileDoesNotExist();
-	}
-
-	fgets(line,999,p);
-	while(1) {
-		lineS = lineS + sizeof(line);
-		if(line[strlen(line)-1] != '\n'){
-			line[strlen(line)] = '\0';
-			line[strlen(line)+1] = '\n';
-		}
-
-		char string = lineCtr + '0';
-		char lineString[2] = "";
-
-		strncat(lineString ,&string, 1);
-		set(lineString,line);
-		lineCtr += 1;
-
-		if(feof(p)) {
-			break;
-		}
-
-		fgets(line,999,p);
-	}
-
-    fclose(p);
-
-	char index = 0 + '0';
-	char startingPoint[2] = "";
-	strncat(startingPoint ,&index, 1);
-	int pos = mem_get_location(startingPoint);
-	struct memoryLocation memloc = {
-		.position = pos,
-		.length = lineCtr
-	};
-	UNIQUE_PID = UNIQUE_PID + 1;
-
-	pcb_t *head = NULL;
-	head = malloc(sizeof(pcb_t));
-	head->PID = UNIQUE_PID;
-	head->location = memloc;
-	head->next = NULL;
-	int m = 0;
-	while(head != NULL){
-		for (int i = head->location.position; i < head->location.length; i++)
-		{
-			m++;
-			char in = i + '0';
-			char stPoint[2] = "";
-			strncat(stPoint ,&in, 1);
-			parseInput(mem_get_value(stPoint));
-			head->currentInstruction += 1;
-		}
-		mem_free_space(head->location.position,head->location.length);
-		head = head->next;
-	}
-
-	return errCode;
-
-}
-
 int exec(char* scripts[], int size) {
 	// printf("%d \n", FRAMESIZE);
 	if(size == 3){
@@ -585,7 +513,7 @@ int exec(char* scripts[], int size) {
 	else if(strcmp(scripts[size-1], "RR") == 0) {
 
 		if (size == 3) {
-			printf("here");
+			// printf("here");
 			// load lines
 			char* allLines[1][1000];
 			int lineCounts[1];
@@ -994,9 +922,9 @@ int exec(char* scripts[], int size) {
 						// printf("%d lineCont \n", lineCounts[i]);
 						// printf("%d i\n", i);
 
-						printf("%d i\n", i);
-						printf("%d x\n", x);
-						printf("%d offset\n", offset);
+						// printf("%d i\n", i);
+						// printf("%d x\n", x);
+						// printf("%d offset\n", offset);
 						if (i == 0 && prog1Done == 0) {
 
 						} else if (i == 1 && prog2Done == 0) {
@@ -1007,13 +935,13 @@ int exec(char* scripts[], int size) {
 						else if (x + offset >= lineCounts[i]) {
 
 							if (i == 0) {
-								printf("prog1Done\n");
+								// printf("prog1Done\n");
 								prog1Done = 0;
 							} else if (i == 1) {
-								printf("prog2Done\n");
+								// printf("prog2Done\n");
 								prog2Done = 0;
 							} else if (i == 2) {
-								printf("prog3Done\n");
+								// printf("prog3Done\n");
 								prog3Done = 0;
 							}
 						} else {
@@ -1022,7 +950,7 @@ int exec(char* scripts[], int size) {
 							backingStore[frameIndex] = strdup(allLines[i][x + offset]);
 							// parseInput(allLines[i][x + offset]);
 						}
-						printf("---------\n");
+						// printf("---------\n");
 
 					frameIndex++;
 
@@ -1031,11 +959,11 @@ int exec(char* scripts[], int size) {
 				offset += 2;
 			}
 
-			for (int i = 0; i < 50; i++) {
-				printf("%s \n", backingStore[i]);
-			}
+			// for (int i = 0; i < 50; i++) {
+			// 	printf("%s \n", backingStore[i]);
+			// }
 
-			return 0;
+			// return 0;
 
 			// load into frame store
 
@@ -1046,7 +974,7 @@ int exec(char* scripts[], int size) {
 			}
 
 			// for (int i = 0; i < 50; i++) {
-			// 	printf("%s \n", directoryStore[i]);
+			// 	printf("%s dir \n", directoryStore[i]);
 			// }
 			// return 0;
 			// loaded into frameStore
@@ -1074,6 +1002,7 @@ int exec(char* scripts[], int size) {
 					if (found) {
 						// printf("FOUND | ");
 						// printf("%s \n", backingStore[i]);
+						// printf("%s command\n", backingStore[i]);
 						parseInput(backingStore[i]);
 					} else {
 						// PAGE FAULT HERE
@@ -1253,6 +1182,7 @@ int exec(char* scripts[], int size) {
 		return 0;
 	}
 	else {
+		printf("awdadwa");
 		return badcommand();
 	}
 }

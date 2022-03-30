@@ -80,6 +80,7 @@ int parseInput(char ui[]) {
 		a++;
 		w++;
 	}
+	// printf("%s hereeee \n", words);
 	errorCode = interpreter(words, w);
 
 	return errorCode;
