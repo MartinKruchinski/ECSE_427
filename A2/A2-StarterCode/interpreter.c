@@ -1044,6 +1044,10 @@ int exec(char* scripts[], int size) {
 				fgets(line,999,p);
 				while(1) {
 
+					if(line[strlen(line)-1] != '\n'){
+						line[strlen(line)+1] = '\0';
+					}
+
 					lineCtr += 1;
 					allLines[i-1][lineCtr-1] = strdup(line);
 
@@ -1057,17 +1061,64 @@ int exec(char* scripts[], int size) {
 				}
 				lineCounts[i - 1] = lineCtr;
 			}
+			// files loaded into allLines
+
+			// load into directoryStore
+			char* directoryStore[1000];
+
+			for (int i = 0; i < 1000; i++) {
+				directoryStore[i] = "none";
+			}
 
 			int offset = 0;
+			int curProg = 0;
+			int maxLines = MAX(lineCounts[0], lineCounts[1]);
+			int sum = lineCounts[0] + lineCounts[1];
+
+			for (int i = 0; i < sum/2 + 1; i++) {
+				if (offset < maxLines) {
+					while (offset >= lineCounts[curProg]) {
+						curProg = (curProg + 1) % 2;
+					}
+				}
+				for (int j = 0 ; j < 3; j++ ) {
+					if (j + offset < lineCounts[curProg]) {
+						directoryStore[i * 3 + j] = allLines[curProg][j + offset];
+					}
+				}
+				if (curProg + 1 == 2) {
+					offset += 3;
+				}
+				curProg = (curProg + 1) % 2;
+			}
+
+			// loaded into frame
+
+			offset = 0;
+
+			int frameIndex = 0;
+			char* backingStore[1000];
+
+			for (int i = 0; i < 1000; i++) {
+				backingStore[i] = "none";
+			}
+
 			int prog1Done = 1;
 			int prog2Done = 1;
 
+			int curSetting;
 
-			while ((prog1Done || prog2Done )) {
+			// load into backing store as RR
+			while ((prog1Done || prog2Done)) {
 
 				for (int i = 0; i < 2; i++) {
 					for (int x = 0; x < 2; x++) {
-						if (x + offset >= lineCounts[i]) {
+						if (i == 0 && prog1Done == 0) {
+
+						} else if (i == 1 && prog2Done == 0) {
+
+						}
+						else if (x + offset >= lineCounts[i]) {
 
 							if (i == 0) {
 								prog1Done = 0;
@@ -1075,12 +1126,150 @@ int exec(char* scripts[], int size) {
 								prog2Done = 0;
 							}
 						} else {
-							parseInput(allLines[i][x + offset]);
+							backingStore[frameIndex] = strdup(allLines[i][x + offset]);
 						}
+
+					frameIndex++;
+
 					}
 				}
 				offset += 2;
 			}
+
+
+			// load into frame store
+
+			char* frameStore[FRAMESIZE];
+
+			int minFrame = MIN(FRAMESIZE, 18);
+
+			for (int i = 0; i < FRAMESIZE; i++) {
+				frameStore[i] = "free";
+			}
+
+			for (int i = 0; i < minFrame; i++) {
+				frameStore[i] = strdup(directoryStore[i]);
+			}
+
+			// loaded into frameStore
+
+			// Start runnin commands
+			frameIndex = minFrame % FRAMESIZE;
+			int directoryIndex = minFrame;
+			int i = 0;
+			while (i < 500) {
+				// search frameStore for command
+				if (strcmp(backingStore[i], "none") != 0) {
+					int found = 0;
+					for (int j = 0; j < FRAMESIZE; j++) {
+						if (strcmp(frameStore[j], backingStore[i]) == 0) {
+							found = 1;
+						}
+					}
+
+					if (found) {
+						parseInput(backingStore[i]);
+					} else {
+
+						if (strcmp(frameStore[frameIndex], "free") == 0) {
+							printf("%s command", backingStore[i]);
+							char* temp = strdup(directoryStore[directoryIndex]);
+							frameStore[frameIndex] = temp;
+
+							temp = strdup(directoryStore[directoryIndex + 1]);
+							frameStore[frameIndex + 1] = temp;
+
+							temp = strdup(directoryStore[directoryIndex + 2]);
+							frameStore[frameIndex + 2] = temp;
+
+							frameIndex = (frameIndex + 3) % FRAMESIZE;
+							directoryIndex += 3;
+
+							// move commands around in the backingStore
+							// even num means its the first command of 2
+							if (i % 2 == 0){
+								// printf("here\n");
+								char* temp = strdup(backingStore[i]);
+								char* temp2 = strdup(backingStore[i + 1]);
+
+								backingStore[i] = backingStore[i + 2];
+								backingStore[i + 1] = backingStore[i + 3];
+
+								backingStore[i + 2] = temp;
+								backingStore[i + 3] = temp2;
+
+								i--;
+							} else { // odd means that the second command in RR failed, need to do extra
+								char* temp = strdup(backingStore[i]);
+								backingStore[i - 1] = backingStore[i + 1];
+								backingStore[i] = backingStore[i + 2];
+
+								backingStore[i + 1] = "none";
+								backingStore[i + 2] = temp;
+
+								i--;
+								i--;
+							}
+						} else {
+							// PAGE FAULT HERE
+							printf("Page fault! Victim Contents:\n");
+
+							char* temp = strdup(frameStore[frameIndex]);
+							printf("%s", temp);
+
+							temp = strdup(frameStore[frameIndex + 1]);
+							printf("%s", temp);
+
+							temp = frameStore[frameIndex + 2];
+							printf("%s", temp);
+
+							printf("End of victim page contents.\n");
+
+							// replace frameStore with directory store
+							temp = strdup(directoryStore[directoryIndex]);
+							frameStore[frameIndex] = temp;
+
+							temp = strdup(directoryStore[directoryIndex + 1]);
+							frameStore[frameIndex + 1] = temp;
+
+							temp = strdup(directoryStore[directoryIndex + 2]);
+							frameStore[frameIndex + 2] = temp;
+
+							frameIndex = (frameIndex + 3) % FRAMESIZE;
+							directoryIndex += 3;
+
+							// move commands around in the backingStore
+							// even num means its the first command of 2
+							if (i % 2 == 0){
+								// printf("here\n");
+								char* temp = strdup(backingStore[i]);
+								char* temp2 = strdup(backingStore[i + 1]);
+
+								backingStore[i] = backingStore[i + 2];
+								backingStore[i + 1] = backingStore[i + 3];
+
+								backingStore[i + 2] = temp;
+								backingStore[i + 3] = temp2;
+
+								i--;
+							} else { // odd means that the second command in RR failed, need to do extra
+								char* temp = strdup(backingStore[i]);
+								backingStore[i - 1] = backingStore[i + 1];
+								backingStore[i] = backingStore[i + 2];
+
+								backingStore[i + 1] = "none";
+								backingStore[i + 2] = temp;
+
+								i--;
+								i--;
+							}
+						}
+					}
+				}
+				i++;
+			}
+
+			return 0;
 		}
 	}
 	else if(strcmp(scripts[size-1], "AGING") == 0){
