@@ -9,7 +9,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 
-#ifndef VARSIZE
+#ifndef VARMEMSIZE
 #define FRAMESIZE
 #endif
 

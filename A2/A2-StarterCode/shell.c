@@ -11,13 +11,13 @@
 int MAX_USER_INPUT = 1000;
 int parseInput(char ui[]);
 int framesize = FRAMESIZE;
-int varsize = VARSIZE;
+int varmemsize = VARMEMSIZE;
 
 int main(int argc, char *argv[]) {
 
 	printf("%s\n", "Shell version 1.1 Created January 2022");
 	help();
-	printf("Frame Store size = %d; Variable Store size = %d\n", framesize, varsize);
+	printf("Frame Store size = %d; Variable Store size = %d\n", framesize, varmemsize);
 
 	char prompt = '$';  				// Shell prompt
 	char userInput[MAX_USER_INPUT];		// user's input stored here
