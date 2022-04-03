@@ -12,6 +12,8 @@ make clean
 make mysh framesize=<YOUR_VALUE> varmemsize=<YOUR_VALUE>
 ./mysh < <TESTCASE_FILE>
 
+To change the framesize you must quit the shell and re-run the make commands.
+
 RESETMEM:
 There is also the new resetmem command in the shell which serves to wipe all variables stored.
 It will print out "Memory was Reset" to let the user know the command has passed.
