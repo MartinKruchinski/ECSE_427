@@ -5,6 +5,8 @@ Martin Kruchinski 260915767
 Hello,
 This is the Demand Paging README for ECSE-427.
 
+This assignment was built on our code from A2, which passed all testcases.
+
 Our program works by running following commands:
 make clean
 make mysh framesize=<YOUR_VALUE> varmemsize=<YOUR_VALUE>
