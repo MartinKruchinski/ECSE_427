@@ -912,7 +912,7 @@ int exec(char* scripts[], int size) {
 					} else {
 
 						if (strcmp(frameStore[frameIndex], "free") == 0) {
-							printf("%s command", backingStore[i]);
+							// printf("%s command", backingStore[i]);
 							char* temp = strdup(directoryStore[directoryIndex]);
 							frameStore[frameIndex] = temp;
 
